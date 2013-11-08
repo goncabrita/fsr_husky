@@ -1,0 +1,5 @@
+To install the husky rules on your computer run the following commands on a terminal window:
+
+$ roscd fsr_husky_bringup
+$ cd rules
+$ sudo cp -f husky.rules /etc/udev/rules.d/

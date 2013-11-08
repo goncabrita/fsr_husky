@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- PointGrey Flea3 GigE Cameras -->
+	<group ns="stereo">
+		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node" output="screen" >
+			<!-- <param name="use_software_trigger" value="true" /> -->
+			<param name="ip_address" value="192.168.10.186" />
+			<param name="frame_id" value="left_camera" />
+		</node>
+		<node name="right" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node"  output="screen">
+			<param name="ip_address" value="192.168.10.187" />
+			<param name="frame_id" value="right_camera" />
+		</node>
+	</group>
+
+	<!-- Visual Odometry -->
+	<!-- <node name="stereo_odometry" pkg="viso2_ros" type="stereo_odometer" >
+		<param name="odom_frame_id" value="odom" />
+	</node> -->
+
+	<!-- FSR Husky URDF -->
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky.urdf.xacro'" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+</launch>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- PointCloud Generator - Tilts the laser and generates PointCloids -->
+  	<node type="pointcloud_generator" pkg="fsr_husky_driver" name="pointcloud_generator" output="screen">
+		<param name="lower_tilt" value="0.0" />
+		<param name="upper_tilt" value="0.5" />
+		<param name="tilt_speed" value="0.4" />
+	</node>
+
+</launch>
