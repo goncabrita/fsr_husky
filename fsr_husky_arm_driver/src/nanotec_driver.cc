@@ -34,14 +34,18 @@ bool Nanotec::sendMessage(char* message, unsigned int message_size, char* reply,
     }
     data[message_size+2] = '\r';
 
+    //printf("[REQUEST] %s\n", data);
+
     device_.write(data, message_size+3);
 
-    try{ reply_size = device_.read(data, NANOTEC_MSG_LEN, NANOTEC_TIMEOUT); }
+    try{ reply_size = device_.readLine(reply, NANOTEC_MSG_LEN, NANOTEC_TIMEOUT); }
     catch(cereal::TimeoutException& e)
     {
         return false;
     }
+    reply[reply_size] = 0;
 
+    //printf("[REPLY] %s\n", reply);
 
     return true;
 }
@@ -69,6 +73,35 @@ bool Nanotec::stopMotor()
     {
         return false;
     }
+    return true;
+}
+
+bool Nanotec::setPositionMode()
+{
+    char reply[NANOTEC_MSG_LEN];
+    unsigned int reply_size;
+
+    char message[] = "p=2";
+    if(!sendMessage(message, 3, reply, reply_size))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool Nanotec::setDirection(unsigned int direction)
+{
+    char reply[NANOTEC_MSG_LEN];
+    unsigned int reply_size;
+
+    char message[32];
+    sprintf(message, "d=%u", direction);
+    if(!sendMessage(message, 3, reply, reply_size))
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -101,7 +134,9 @@ bool Nanotec::getPosition(int& position)
         return false;
     }
 
-    sscanf(reply, "#1C=%d", &position);
+    int p;
+    sscanf(reply, "1C+%d", &p);
+    position = p;
     return true;
 }
 
@@ -115,10 +150,11 @@ bool Nanotec::startHoming()
     {
         return false;
     }
+
     return startMotor();
 }
 
-bool Nanotec::positionError()
+int Nanotec::getStatus()
 {
     char reply[NANOTEC_MSG_LEN];
     unsigned int reply_size;
@@ -130,9 +166,8 @@ bool Nanotec::positionError()
     }
 
     int status;
-    sscanf(reply, "#001$%d", &status);
-    if(status==164) return true;
-    return false;
+    sscanf(reply, "001$%d", &status);
+    return status;
 }
 
 bool Nanotec::clearPositionError()
