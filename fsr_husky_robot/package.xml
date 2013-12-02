@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>fsr_husky_robot</name>
+  <version>0.0.0</version>
+  <description>The fsr_husky_robot package</description>
+
+  <maintainer email="goncabrita@gmail.com">Gonçalo Cabrita</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/fsr_husky_robot</url>
+
+  <author email="goncabrita@gmail.com">Gonçalo Cabrita</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>fsr_husky_bringup</run_depend>
+  <run_depend>fsr_husky_description</run_depend>
+  <run_depend>fsr_husky_driver</run_depend>
+  <run_depend>fsr_husky_teleop</run_depend>
+
+  <export>
+    <metapackage/> 
+  </export>
+</package>
