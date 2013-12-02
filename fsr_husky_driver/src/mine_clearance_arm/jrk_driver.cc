@@ -1,6 +1,6 @@
 
 
-#include <jrk_driver.h>
+#include "jrk_driver.h"
 #include <stdio.h>
 
 JRK::JRK() : device_()

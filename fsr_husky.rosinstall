@@ -1,0 +1,46 @@
+##############################################################################
+#
+# Source installation for the FSR Husky robot
+#
+##############################################################################
+
+# The FSR Husky ROS packages
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/fsr_husky.git
+    local-name: fsr_husky
+    version: master
+
+
+# CerealPort
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/roomba/cereal_port.git
+    local-name: cereal_port
+    version: master
+
+
+# RTK GPS
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/rtk_gps.git
+    local-name: rtk_gps
+    version: master
+
+
+# Hardware drivers for sensors and actuators
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/lms1xx_driver.git
+    local-name: lms1xx_driver
+    version: master
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/xsens_driver.git
+    local-name: xsens_driver
+    version: master
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/pgr_gige_camera_driver.git
+    local-name: pgr_gige_camera_driver
+    version: master
