@@ -44,3 +44,8 @@
     uri: http://ubuntu-fsr.isr.uc.pt/husky/pgr_gige_camera_driver.git
     local-name: pgr_gige_camera_driver
     version: master
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/ptu_d46_driver.git
+    local-name: ptu_d46_driver
+    version: master
