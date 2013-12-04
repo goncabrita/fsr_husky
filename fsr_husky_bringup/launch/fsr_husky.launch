@@ -46,7 +46,7 @@
 
 	<!-- SICK LMS100 Laser Range Finder -->
 	<node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" >
-		<param name="host" value="192.168.10.185" />
+		<param name="host" value="192.168.4.13" />
 		<param name="frame_id" value="sick_lms100" />
 	</node>
 

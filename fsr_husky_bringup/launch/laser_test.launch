@@ -3,13 +3,13 @@
 
 	<!-- SICK LMS100 Laser Range Finder -->
 	<node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" >
-		<param name="host" value="192.168.10.185" />
+		<param name="host" value="192.168.4.13" />
 		<param name="frame_id" value="sick_lms100" />
 	</node>
 
 	<!-- PTU-D46 Pan and Tilt -->
 	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" >
-		<param name="port" value="/dev/ttyUSB1" />
+		<param name="port" value="/dev/ptu_d46" />
 	</node>
 
 	<!-- Laser Assembler - Converts laser scans to a PointCloud2 message using the pan and tilt unit -->
