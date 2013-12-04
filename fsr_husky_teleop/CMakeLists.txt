@@ -4,10 +4,10 @@ project(fsr_husky_teleop)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED roscpp sensor_msgs ptu_d46_driver actionlib)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -62,6 +62,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
+include_directories(${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ## Declare a cpp library
 # add_library(fsr_husky_teleop
@@ -70,6 +71,7 @@ catkin_package(
 
 ## Declare a cpp executable
 # add_executable(fsr_husky_teleop_node src/fsr_husky_teleop_node.cpp)
+add_executable(joystick_teleop_node src/joystick_teleop.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -79,6 +81,7 @@ catkin_package(
 # target_link_libraries(fsr_husky_teleop_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(joystick_teleop_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

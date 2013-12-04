@@ -28,9 +28,9 @@
 	</group>
 
 	<!-- Visual Odometry -->
-	<node name="stereo_odometry" pkg="viso2_ros" type="stereo_odometer" >
+	<!-- <node name="stereo_odometry" pkg="viso2_ros" type="stereo_odometer" >
 		<param name="odom_frame_id" value="odom" />
-	</node>
+	</node> -->
 
 	<!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
 	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
@@ -39,7 +39,7 @@
     		<param name="sensor_timeout" value="1.0"/>
     		<param name="odom_used" value="true"/>
     		<param name="imu_used" value="true"/>
-    		<param name="vo_used" value="true"/>
+    		<param name="vo_used" value="false"/>
     		<param name="debug" value="false"/>
     		<param name="self_diagnose" value="false"/>
   	</node>
