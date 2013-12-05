@@ -125,12 +125,12 @@ FSRHuskyTeleop::FSRHuskyTeleop(): ph_("~")
 
   ph_.param("multiplex", mux_, false);
 
-  vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/husky/cmd_vel", 1);
-  pan_and_tilt_pub_ = nh_.advertise<sensor_msgs::JointState>("/ptu_d46/cmd", 1);
-  arm_pub_ = nh_.advertise<sensor_msgs::JointState>("/husky_arm/cmd", 1);
+  vel_pub_ = nh_.advertise<geometry_msgs::Twist>("husky/cmd_vel", 1);
+  pan_and_tilt_pub_ = nh_.advertise<sensor_msgs::JointState>("ptu_d46/cmd", 1);
+  arm_pub_ = nh_.advertise<sensor_msgs::JointState>("husky_arm/cmd", 1);
   if(mux_) vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &FSRHuskyTeleop::velCallback, this);
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &FSRHuskyTeleop::joyCallback, this);
-  joint_sub_ = nh_.subscribe<sensor_msgs::JointState>("/joint_state", 10, &FSRHuskyTeleop::jointCallback, this);
+  joint_sub_ = nh_.subscribe<sensor_msgs::JointState>("joint_states", 10, &FSRHuskyTeleop::jointCallback, this);
 
   dead_man_switch_pressed_ = false;
   brake_button_pressed_ = false;
@@ -228,9 +228,9 @@ void FSRHuskyTeleop::publish()
 {
     //boost::mutex::scoped_lock lock(publish_mutex_);
 
-    if((!dead_man_switch_pressed_ && (vel_.angular.z != 0.0 || vel_.angular.z != 0.0)) || brake_button_pressed_)
+    if((!dead_man_switch_pressed_ && (vel_.angular.z != 0.0 || vel_.linear.x != 0.0)) || brake_button_pressed_)
     {
-        vel_.angular.z == 0.0;
+        vel_.linear.x == 0.0;
         vel_.angular.z == 0.0;
         vel_pub_.publish(vel_);
     }
