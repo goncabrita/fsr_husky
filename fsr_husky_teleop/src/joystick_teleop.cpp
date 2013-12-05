@@ -166,21 +166,22 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   if(joy->buttons[brake_button_] == 1) brake_button_pressed_ = true;
   else brake_button_pressed_ = false;
 
+  sensor_msgs::JointState joint;
+  joint.header.stamp = ros::Time::now();
+  joint.name.resize(2);
+  joint.position.resize(2);
+  joint.velocity.resize(2);
+  joint.name[0] = "ptu_d46_pan_joint";
+  joint.position[0] = 0.0;
+  joint.velocity[0] = pan_speed_;
+  joint.name[1] = "ptu_d46_tilt_joint";
+  joint.position[1] = 0.0;
+  joint.velocity[1] = tilt_speed_;
+
+  double publish = false;
+
   if(joy->axes[pan_and_tilt_trigger_] == -1.0)
   {
-        sensor_msgs::JointState joint;
-        joint.header.stamp = ros::Time::now();
-        joint.name.resize(2);
-        joint.position.resize(2);
-        joint.velocity.resize(2);
-        joint.name[0] = "ptu_d46_pan_joint";
-        joint.position[0] = 0.0;
-        joint.velocity[0] = pan_speed_;
-        joint.name[1] = "ptu_d46_tilt_joint";
-        joint.position[1] = 0.0;
-        joint.velocity[1] = tilt_speed_;
-
-        double publish = false;
         if(joy->buttons[reset_button_] == 1)
         {
             pan_speed_ = 0.5;
@@ -191,32 +192,38 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         }
         else
         {
-            if(pan_and_tilt_moving_ && joy->axes[pan_] < 0.1 && joy->axes[pan_] > -0.1 && joy->axes[tilt_] < 0.1 && joy->axes[tilt_] > -0.1)
+            if(pan_and_tilt_moving_ && (fabs(joy->axes[pan_]) < 0.2 && fabs(joy->axes[tilt_]) < 0.2))
             {
                 joint.position[0] = joints_.position[0];
                 joint.position[1] = joints_.position[1];
 
-                pan_speed_ = 0.5;
-                tilt_speed_ = 0.5;
-
                 pan_and_tilt_moving_ = false;
                 publish = true;
             }
-            else if(!pan_and_tilt_moving_ && (joy->axes[pan_] > 0.2 || joy->axes[pan_] < -0.2 || joy->axes[tilt_] > 0.2 || joy->axes[tilt_] < -0.2))
+            else if(!pan_and_tilt_moving_ && (fabs(joy->axes[pan_]) > 0.2 || fabs(joy->axes[tilt_]) > 0.2))
             {
-                if(joy->axes[pan_] > 0.2 || joy->axes[pan_] < -0.2) joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
-                if(joy->axes[tilt_] > 0.2 || joy->axes[tilt_] < -0.2) joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
+                if(fabs(joy->axes[pan_]) > 0.2) joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
+                if(fabs(joy->axes[tilt_]) > 0.2) joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
 
-                pan_speed_ = 0.8*fabs(joy->axes[pan_]);
-                tilt_speed_ = 0.8*fabs(joy->axes[tilt_]);
+                pan_speed_ = 0.4*fabs(joy->axes[pan_]);
+                tilt_speed_ = 0.4*fabs(joy->axes[tilt_]);
 
                 pan_and_tilt_moving_ = true;
                 publish = true;
             }
         }
-        if(publish) pan_and_tilt_pub_.publish(joint);
   }
-  else if(joy->buttons[arm_button_] == 1)
+  else if(pan_and_tilt_moving_)
+  {
+      joint.position[0] = joints_.position[0];
+      joint.position[1] = joints_.position[1];
+
+      pan_and_tilt_moving_ = false;
+      publish = true;
+  }
+  if(publish) pan_and_tilt_pub_.publish(joint);
+
+  if(joy->buttons[arm_button_] == 1)
   {
     // TODO...
   }
