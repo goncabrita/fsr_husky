@@ -11,7 +11,8 @@
 
 	<!-- XSens MTi-300 IMU -->
 	<node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
-		<param name="port" value="/dev/mti_300" />
+		<param name="device" value="/dev/mti_300" />
+		<param name="baudrate" value="115200" />
 	</node>
 
 	<!-- PointGrey Flea3 GigE Cameras -->
@@ -56,7 +57,7 @@
 	</node>
 
 	<!-- Laser Assembler - Converts laser scans to a PointCloud2 message using the pan and tilt unit -->
-  	<node type="laser_scan_assembler" pkg="laser_assembler" name="laser_scan_assembler">
+  	<node type="laser_scan_assembler" pkg="laser_assembler" name="laser_scan_assembler" output="screen">
     		<param name="max_scans" type="int" value="100" />
     		<param name="fixed_frame" type="string" value="base_link" />
   	</node>
