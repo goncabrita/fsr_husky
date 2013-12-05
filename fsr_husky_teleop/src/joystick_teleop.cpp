@@ -190,16 +190,16 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         {
             if(pan_and_tilt_moving_ && joy->axes[pan_] < 0.9 && joy->axes[pan_] > -0.9 && joy->axes[tilt_] < 0.9 && joy->axes[tilt_] > -0.9)
             {
-                joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
-                joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
+                joint.position[0] = joints_.position[0];
+                joint.position[1] = joints_.position[1];
 
                 pan_and_tilt_moving_ = false;
                 publish = true;
             }
             else if(!pan_and_tilt_moving_ && (joy->axes[pan_] > 0.9 || joy->axes[pan_] < -0.9 || joy->axes[tilt_] > 0.9 || joy->axes[tilt_] < -0.9))
             {
-                joint.position[0] = joints_.position[0];
-                joint.position[1] = joints_.position[1];
+                joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
+                joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
 
                 pan_and_tilt_moving_ = true;
                 publish = true;
@@ -230,8 +230,8 @@ void FSRHuskyTeleop::publish()
 
     if((!dead_man_switch_pressed_ && (vel_.angular.z != 0.0 || vel_.linear.x != 0.0)) || brake_button_pressed_)
     {
-        vel_.linear.x == 0.0;
-        vel_.angular.z == 0.0;
+        vel_.linear.x = 0.0;
+        vel_.angular.z = 0.0;
         vel_pub_.publish(vel_);
     }
     else if(dead_man_switch_pressed_)
