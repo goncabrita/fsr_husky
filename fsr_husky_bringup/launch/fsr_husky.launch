@@ -33,7 +33,7 @@
 	</node> -->
 
 	<!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
-	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+	<!-- <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
     		<param name="output_frame" value="odom"/>
     		<param name="freq" value="30.0"/>
     		<param name="sensor_timeout" value="1.0"/>
@@ -42,7 +42,7 @@
     		<param name="vo_used" value="false"/>
     		<param name="debug" value="false"/>
     		<param name="self_diagnose" value="false"/>
-  	</node>
+  	</node> -->
 
 	<!-- SICK LMS100 Laser Range Finder -->
 	<node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" >
@@ -56,7 +56,7 @@
 	</node>
 
 	<!-- Laser Assembler - Converts laser scans to a PointCloud2 message using the pan and tilt unit -->
-  	<node type="laser_scan_assembler" pkg="laser_assembler" name="laser_scan_assembler" output="screen">
+  	<node type="laser_scan_assembler" pkg="laser_assembler" name="laser_scan_assembler">
     		<param name="max_scans" type="int" value="100" />
     		<param name="fixed_frame" type="string" value="base_link" />
   	</node>
