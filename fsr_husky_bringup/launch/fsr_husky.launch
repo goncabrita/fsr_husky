@@ -16,12 +16,12 @@
 
 	<!-- PointGrey Flea3 GigE Cameras -->
 	<group ns="stereo">
-		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node" output="screen" >
+		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
 			<!-- <param name="use_software_trigger" value="true" /> -->
 			<param name="ip_address" value="192.168.4.11" />
 			<param name="frame_id" value="left_camera" />
 		</node>
-		<node name="right" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node"  output="screen">
+		<node name="right" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node" >
 			<param name="ip_address" value="192.168.4.12" />
 			<param name="frame_id" value="right_camera" />
 		</node>
@@ -51,7 +51,7 @@
 	</node>
 
 	<!-- PTU-D46 Pan and Tilt -->
-	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" >
+	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" output="screen" >
 		<param name="port" value="/dev/ptu_d46" />
 	</node>
 
