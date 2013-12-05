@@ -78,6 +78,8 @@ private:
   double lower_tilt_limit_;
   double pan_speed_;
   double tilt_speed_;
+  double max_pan_speed_;
+  double max_tilt_speed_;
 
   ros::Publisher vel_pub_;
   ros::Publisher pan_and_tilt_pub_;
@@ -115,11 +117,11 @@ FSRHuskyTeleop::FSRHuskyTeleop(): ph_("~")
   ph_.param("scale_angular", a_scale_, 0.9);
   ph_.param("scale_linear", l_scale_, 0.3);
 
-  ph_.param("tilt_speed", tilt_speed_, 0.5);
+  ph_.param("max_tilt_speed", max_tilt_speed_, 0.6);
   ph_.param("lower_tilt_limit", lower_tilt_limit_, -0.5);
   ph_.param("upper_tilt_limit", upper_tilt_limit_, 0.5);
 
-  ph_.param("pan_speed", pan_speed_, 0.5);
+  ph_.param("max_pan_speed", max_pan_speed_, 0.6);
   ph_.param("lower_pan_limit", lower_pan_limit_, -0.5);
   ph_.param("upper_pan_limit", upper_pan_limit_, 0.5);
 
@@ -180,6 +182,7 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
   double publish = false;
 
+  // TODO: Change this so that the pan and tilt isent allways being updated!
   if(joy->axes[pan_and_tilt_trigger_] == -1.0)
   {
         if(joy->buttons[reset_button_] == 1)
@@ -205,8 +208,8 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
                 if(fabs(joy->axes[pan_]) > 0.2) joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
                 if(fabs(joy->axes[tilt_]) > 0.2) joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
 
-                pan_speed_ = 0.7*fabs(joy->axes[pan_]);
-                tilt_speed_ = 0.7*fabs(joy->axes[tilt_]);
+                pan_speed_ = max_pan_speed_*fabs(joy->axes[pan_]);
+                tilt_speed_ = max_tilt_speed_*fabs(joy->axes[tilt_]);
 
                 pan_and_tilt_moving_ = true;
                 publish = true;
