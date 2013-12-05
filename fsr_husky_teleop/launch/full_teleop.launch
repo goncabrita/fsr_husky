@@ -2,7 +2,7 @@
 
   <node pkg="joy" type="joy_node" name="joystick"/>
 
-  <node pkg="fsr_husky_teleop" type="joystick_teleop_node" name="fsr_husky_xbox360">
+  <node pkg="fsr_husky_teleop" type="joystick_teleop_node" name="full_teleop" output="screen">
     <param name="scale_angular" value="1.5"/>
     <param name="scale_linear" value="0.5"/>
     <param name="control_pan_and_tilt" value="true"/>
