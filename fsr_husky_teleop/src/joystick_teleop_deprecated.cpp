@@ -39,10 +39,12 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Joy.h>
-#include <sensor_msgs/JointState.h>
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/thread.hpp"
 #include "ros/console.h"
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+#include <ptu_d46_driver/GotoAction.h>
 
 class FSRHuskyTeleop
 {
@@ -52,8 +54,8 @@ public:
 private:
   void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
   void velCallback(const geometry_msgs::Twist::ConstPtr& vel);
-  void jointCallback(const sensor_msgs::JointState::ConstPtr& joint);
   void publish();
+  void goalDoneCallback(const actionlib::SimpleClientGoalState &state, const ptu_d46_driver::GotoResultConstPtr &result);
 
   ros::NodeHandle ph_, nh_;
 
@@ -72,6 +74,8 @@ private:
   double l_scale_;
   double a_scale_;
 
+  double pan_increment_;
+  double tilt_increment_;
   double upper_pan_limit_;
   double lower_pan_limit_;
   double upper_tilt_limit_;
@@ -79,77 +83,92 @@ private:
   double pan_speed_;
   double tilt_speed_;
 
+  int pan_action_;
+  int tilt_action_;
+
   ros::Publisher vel_pub_;
-  ros::Publisher pan_and_tilt_pub_;
-  ros::Publisher arm_pub_;
   ros::Subscriber vel_sub_;
   ros::Subscriber joy_sub_;
-  ros::Subscriber joint_sub_;
+  actionlib::SimpleActionClient<ptu_d46_driver::GotoAction> pan_and_tilt_ac_;
 
   bool dead_man_switch_pressed_;
   bool brake_button_pressed_;
 
-  bool mux_;
+  bool reset_pan_and_tilt_;
+  bool reset_arm_;
 
-  bool pan_and_tilt_moving_;
-  bool arm_moving_;
+  bool mux_;
+  bool control_pan_and_tilt_;
+  bool control_arm_;
+
+  bool ready_for_pan_and_tilt_;
+  bool ready_for_arm_;
 
   geometry_msgs::Twist vel_;
-
-  sensor_msgs::JointState joints_;
+  ptu_d46_driver::GotoGoal goal_;
 
   ros::Timer timer_;
 };
 
-FSRHuskyTeleop::FSRHuskyTeleop(): ph_("~")
+FSRHuskyTeleop::FSRHuskyTeleop(): ph_("~"), pan_and_tilt_ac_("ptu_d46", true)
 {
   ph_.param("robot_linear_axis", robot_linear_, 1);
   ph_.param("robot_angular_axis", robot_angular_, 0);
   ph_.param("dead_man_switch", robot_dead_man_switch_, 2);
+  ph_.param("scale_angular", a_scale_, 0.9);
+  ph_.param("scale_linear", l_scale_, 0.3);
   ph_.param("pan_axis", pan_, 3);
   ph_.param("tilt_axis", tilt_, 4);
   ph_.param("pan_and_tilt_trigger", pan_and_tilt_trigger_, 5);
   ph_.param("arm_button", arm_button_, 5);
   ph_.param("reset_button", reset_button_, 10);
   ph_.param("brake_button", brake_button_, 1);
-  ph_.param("scale_angular", a_scale_, 0.9);
-  ph_.param("scale_linear", l_scale_, 0.3);
 
-  ph_.param("tilt_speed", tilt_speed_, 0.5);
+  ph_.param("tilt_increment", tilt_increment_, 0.1);
+  ph_.param("tilt_speed", tilt_speed_, 0.8);
   ph_.param("lower_tilt_limit", lower_tilt_limit_, -0.5);
   ph_.param("upper_tilt_limit", upper_tilt_limit_, 0.5);
 
-  ph_.param("pan_speed", pan_speed_, 0.5);
+  ph_.param("pan_increment", pan_increment_, 0.1);
+  ph_.param("pan_speed", pan_speed_, 0.8);
   ph_.param("lower_pan_limit", lower_pan_limit_, -0.5);
   ph_.param("upper_pan_limit", upper_pan_limit_, 0.5);
 
   ph_.param("multiplex", mux_, false);
 
+  ph_.param("control_pan_and_tilt", control_pan_and_tilt_, false);
+  if(control_pan_and_tilt_)
+  {
+      ROS_INFO("FSR Husky Teleop - %s - Waiting for the pan and tilt action server to start...", __FUNCTION__);
+      pan_and_tilt_ac_.waitForServer();
+      ROS_INFO("FSR Husky Teleop - %s - Got it!", __FUNCTION__);
+  }
+
   vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/husky/cmd_vel", 1);
-  pan_and_tilt_pub_ = nh_.advertise<sensor_msgs::JointState>("/ptu_d46/cmd", 1);
-  arm_pub_ = nh_.advertise<sensor_msgs::JointState>("/husky_arm/cmd", 1);
   if(mux_) vel_sub_ = nh_.subscribe<geometry_msgs::Twist>("cmd_vel", 10, &FSRHuskyTeleop::velCallback, this);
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &FSRHuskyTeleop::joyCallback, this);
-  joint_sub_ = nh_.subscribe<sensor_msgs::JointState>("/joint_state", 10, &FSRHuskyTeleop::jointCallback, this);
+
+  ready_for_pan_and_tilt_ = true;
+  ready_for_arm_ = true;
 
   dead_man_switch_pressed_ = false;
   brake_button_pressed_ = false;
 
-  pan_and_tilt_moving_ = false;
-  arm_moving_ = false;
-
   vel_.angular.z = 0.0;
   vel_.linear.x = 0.0;
 
-  joints_.name.resize(4);
-  joints_.position.resize(4);
-  joints_.velocity.resize(4);
-  joints_.name[0] = "ptu_d46_pan_joint";
-  joints_.name[1] = "ptu_d46_tilt_joint";
-  joints_.name[2] = "arm_vertical_axis_joint";
-  joints_.name[3] = "linear_actuator_joint";
+  goal_.joint.header.stamp = ros::Time::now();
+  goal_.joint.name.resize(2);
+  goal_.joint.position.resize(2);
+  goal_.joint.velocity.resize(2);
+  goal_.joint.name[0] = "ptu_d46_pan_joint";
+  goal_.joint.position[0] = 0.0;
+  goal_.joint.velocity[0] = pan_speed_;
+  goal_.joint.name[1] = "ptu_d46_tilt_joint";
+  goal_.joint.position[1] = 0.0;
+  goal_.joint.velocity[1] = tilt_speed_;
 
-  timer_ = nh_.createTimer(ros::Duration(0.1), boost::bind(&FSRHuskyTeleop::publish, this));
+  timer_ = nh_.createTimer(ros::Duration(0.1), boost::bind(&RoombaTeleop::publish, this));
 }
 
 void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
@@ -159,69 +178,60 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
   if(dead_man_switch_pressed_)
   {
-    vel_.angular.z = a_scale_*joy->axes[robot_angular_];
-    vel_.linear.x = l_scale_*joy->axes[robot_linear_];
+    vel.angular.z = a_scale_*joy->axes[robot_angular_];
+    vel.linear.x = l_scale_*joy->axes[robot_linear_];
   }
 
   if(joy->buttons[brake_button_] == 1) brake_button_pressed_ = true;
   else brake_button_pressed_ = false;
 
-  if(joy->axes[pan_and_tilt_trigger_] == -1.0)
+  if(control_pan_and_tilt_ && joy->axes[pan_and_tilt_trigger_] == -1.0)
   {
-        sensor_msgs::JointState joint;
-        joint.header.stamp = ros::Time::now();
-        joint.name.resize(2);
-        joint.position.resize(2);
-        joint.velocity.resize(2);
-        joint.name[0] = "ptu_d46_pan_joint";
-        joint.position[0] = 0.0;
-        joint.velocity[0] = pan_speed_;
-        joint.name[1] = "ptu_d46_tilt_joint";
-        joint.position[1] = 0.0;
-        joint.velocity[1] = tilt_speed_;
-
-        double publish = false;
         if(joy->buttons[reset_button_] == 1)
         {
-            pan_and_tilt_moving_ = false;
-            publish = true;
+            goal_.joint.position[0] = 0.0;
+            goal_.joint.position[1] = 0.0;
+            ready_for_pan_and_tilt_ = false;
+            pan_and_tilt_ac_.sendGoal(goal_, boost::bind(&FSRHuskyTeleop::goalDoneCallback, this, _1, _2));
         }
         else
         {
-            if(pan_and_tilt_moving_ && joy->axes[pan_] < 0.9 && joy->axes[pan_] > -0.9 && joy->axes[tilt_] < 0.9 && joy->axes[tilt_] > -0.9)
+            pan_action_ = 0;
+            tilt_action_ = 0;
+            if(joy->axes[pan_] > 0.9 || joy->axes[pan_] < -0.9 || joy->axes[tilt_] > 0.9 || joy->axes[tilt_] < -0.9)
             {
-                joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
-                joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
-
-                pan_and_tilt_moving_ = false;
-                publish = true;
+                pan_action_ = joy->axes[pan_] > 0 ? 1 : -1;
+                tilt_action = joy->axes[tilt_] < 0 ? 1 : -1;
             }
-            else if(!pan_and_tilt_moving_ && (joy->axes[pan_] > 0.9 || joy->axes[pan_] < -0.9 || joy->axes[tilt_] > 0.9 || joy->axes[tilt_] < -0.9))
-            {
-                joint.position[0] = joints_.position[0];
-                joint.position[1] = joints_.position[1];
 
-                pan_and_tilt_moving_ = true;
-                publish = true;
+            if(ready_for_pan_and_tilt_)
+            {
+                goal_.joint.header.stamp = ros::Time::now();
+
+                goal_.joint.position[0] += pan_action_*pan_increment_;
+                goal_.joint.position[1] += tilt_action_*tilt_increment_;
+                if(goal_.joint.position[0] > upper_pan_limit_) goal_.joint.position[0] = upper_pan_limit_;
+                if(goal_.joint.position[0] < lower_pan_limit_) goal_.joint.position[0] = lower_pan_limit_;
+                if(goal_.joint.position[1] > upper_tilt_limit_) goal_.joint.position[1] = upper_tilt_limit_;
+                if(goal_.joint.position[1] < lower_tilt_limit_) goal_.joint.position[1] = lower_tilt_limit_;
+
+                ready_for_pan_and_tilt_ = false;
+                pan_and_tilt_ac_.sendGoal(goal_, boost::bind(&FSRHuskyTeleop::goalDoneCallback, this, _1, _2));
             }
         }
-        if(publish) pan_and_tilt_pub_.publish(joint);
+
   }
-  else if(joy->buttons[arm_button_] == 1)
+  else if(control_arm_ && joy->buttons[arm_button_] == 1)
   {
     // TODO...
   }
 }
 
-void FSRHuskyTeleop::jointCallback(const sensor_msgs::JointState::ConstPtr& joint)
+void FSRHuskyTeleop::goalDoneCallback(const actionlib::SimpleClientGoalState &state, const ptu_d46_driver::GotoResultConstPtr &result)
 {
-    for(int i=0 ; i<joint->name.size() ; i++)
-    {
-        if(joint->name[i].compare("ptu_d46_pan_joint") == 0) joints_.position[0] = joint->position[i];
-        else if(joint->name[i].compare("ptu_d46_tilt_joint") == 0) joints_.position[1] = joint->position[i];
-        else if(joint->name[i].compare("arm_vertical_axis_joint") == 0) joints_.position[2] = joint->position[i];
-        else if(joint->name[i].compare("linear_actuator_joint") == 0) joints_.position[3] = joint->position[i];
-    }
+    goal_.joint.position[0] = result->joint.position[0];
+    goal_.joint.position[1] = result->joint.position[1];
+    ready_for_pan_and_tilt_ = true;
 }
 
 void FSRHuskyTeleop::publish()
