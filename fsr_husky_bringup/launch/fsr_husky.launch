@@ -6,7 +6,7 @@
 
 	<!-- RTK GPS -->
 	<node name="rtk_robot_node" pkg="rtk_ros" type="rtk_robot_node" >
-		<param name="port" value="/dev/gps" />
+		<param name="port" value="gps" />
 	</node>
 
 	<!-- XSens MTi-300 IMU -->
