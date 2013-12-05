@@ -183,23 +183,32 @@ void FSRHuskyTeleop::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         double publish = false;
         if(joy->buttons[reset_button_] == 1)
         {
+            pan_speed_ = 0.5;
+            tilt_speed_ = 0.5;
+
             pan_and_tilt_moving_ = false;
             publish = true;
         }
         else
         {
-            if(pan_and_tilt_moving_ && joy->axes[pan_] < 0.9 && joy->axes[pan_] > -0.9 && joy->axes[tilt_] < 0.9 && joy->axes[tilt_] > -0.9)
+            if(pan_and_tilt_moving_ && joy->axes[pan_] < 0.1 && joy->axes[pan_] > -0.1 && joy->axes[tilt_] < 0.1 && joy->axes[tilt_] > -0.1)
             {
                 joint.position[0] = joints_.position[0];
                 joint.position[1] = joints_.position[1];
 
+                pan_speed_ = 0.5;
+                tilt_speed_ = 0.5;
+
                 pan_and_tilt_moving_ = false;
                 publish = true;
             }
-            else if(!pan_and_tilt_moving_ && (joy->axes[pan_] > 0.9 || joy->axes[pan_] < -0.9 || joy->axes[tilt_] > 0.9 || joy->axes[tilt_] < -0.9))
+            else if(!pan_and_tilt_moving_ && (joy->axes[pan_] > 0.2 || joy->axes[pan_] < -0.2 || joy->axes[tilt_] > 0.2 || joy->axes[tilt_] < -0.2))
             {
-                joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
-                joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
+                if(joy->axes[pan_] > 0.2 || joy->axes[pan_] < -0.2) joint.position[0] = joy->axes[pan_] > 0 ? upper_pan_limit_ : lower_pan_limit_;
+                if(joy->axes[tilt_] > 0.2 || joy->axes[tilt_] < -0.2) joint.position[1] = joy->axes[tilt_] < 0 ? upper_tilt_limit_ : lower_tilt_limit_;
+
+                pan_speed_ = 0.8*fabs(joy->axes[pan_]);
+                tilt_speed_ = 0.8*fabs(joy->axes[tilt_]);
 
                 pan_and_tilt_moving_ = true;
                 publish = true;
