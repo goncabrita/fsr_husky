@@ -49,3 +49,14 @@
     uri: http://ubuntu-fsr.isr.uc.pt/husky/ptu_d46_driver.git
     local-name: ptu_d46_driver
     version: master
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/metal_detector_sensor_msgs.git
+    local-name: metal_detector_sensor_msgs
+    version: master
+
+- git:
+    uri: http://ubuntu-fsr.isr.uc.pt/husky/vallon_vmp3_driver.git
+    local-name: vallon_vmp3_driver
+    version: master
+

@@ -69,4 +69,14 @@
 	<!--Sound Play -->
 	<node name="sound_play" pkg="sound_play" type="soundplay_node.py" />
 
+	<node pkg="joy" type="joy_node" name="joystick"/>
+
+	<node pkg="fsr_husky_teleop" type="joystick_teleop_node" name="full_teleop" output="screen">
+		<param name="multiplex" value="true"/>
+		<param name="scale_angular" value="1.5"/>
+		<param name="scale_linear" value="0.5"/>
+		<param name="control_pan_and_tilt" value="true"/>
+		<remap from="ptu_d46/cmd" to="cmd"/>
+	</node>
+
 </launch>
