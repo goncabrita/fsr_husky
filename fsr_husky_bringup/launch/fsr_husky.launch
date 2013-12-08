@@ -10,13 +10,13 @@
 	</node>
 
 	<!-- XSens MTi-300 IMU -->
-	<node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
+	<!-- <node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
 		<param name="device" value="/dev/mti_300" />
 		<param name="baudrate" value="115200" />
-	</node>
+	</node> -->
 
 	<!-- PointGrey Flea3 GigE Cameras -->
-	<group ns="stereo">
+	<!-- <group ns="stereo">
 		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
 			<!-- <param name="use_software_trigger" value="true" /> -->
 			<param name="ip_address" value="192.168.4.11" />
@@ -26,7 +26,7 @@
 			<param name="ip_address" value="192.168.4.12" />
 			<param name="frame_id" value="right_camera" />
 		</node>
-	</group>
+	</group> -->
 
 	<!-- Visual Odometry -->
 	<!-- <node name="stereo_odometry" pkg="viso2_ros" type="stereo_odometer" >
