@@ -1,0 +1,13 @@
+global_costmap:
+  width: 30.0
+  height: 30.0
+  plugins:
+   -
+     name: footprint
+     type: "costmap_2d::FootprintLayer"
+   - 
+     name: obstacles
+     type: "costmap_2d::ObstacleLayer"
+   - 
+     name: inflater
+     type: "costmap_2d::InflationLayer"
