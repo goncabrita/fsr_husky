@@ -64,11 +64,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_axel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         back_husky_bridge:
           Alpha: 1
           Show Axes: false
@@ -80,11 +75,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         back_right_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_arm_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -110,6 +100,11 @@ Visualization Manager:
           Show Trail: false
           Value: true
         base_footprint_user_rail_part:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_imu:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -159,21 +154,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        lower_arm:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        metal_detector_antenna:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        metal_detector_arm:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         ptu_d46_base_link:
           Alpha: 1
           Show Axes: false
@@ -210,11 +190,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         sick_lms100:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        upper_arm:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -275,10 +250,10 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.404796
+      Pitch: 0.614796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.75358
+      Yaw: 0.940394
     Saved: ~
 Window Geometry:
   Displays:

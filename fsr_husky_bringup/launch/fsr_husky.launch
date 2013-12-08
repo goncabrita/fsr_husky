@@ -9,11 +9,11 @@
 		<param name="port" value="gps" />
 	</node>
 
-	<!-- XSens MTi-300 IMU -->
+	XSens MTi-300 IMU -->
 	<!-- <node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
 		<param name="device" value="/dev/mti_300" />
 		<param name="baudrate" value="115200" />
-	</node> -->
+	</node>
 
 	<!-- PointGrey Flea3 GigE Cameras -->
 	<!-- <group ns="stereo">
@@ -33,7 +33,9 @@
 	</node> -->
 
 	<!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
-	<!-- <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+		<remap from="odom" to="encoder"/>
+		<remap from="imu_data" to="imu/data"/>
     		<param name="output_frame" value="odom"/>
     		<param name="freq" value="30.0"/>
     		<param name="sensor_timeout" value="1.0"/>
@@ -42,7 +44,7 @@
     		<param name="vo_used" value="false"/>
     		<param name="debug" value="false"/>
     		<param name="self_diagnose" value="false"/>
-  	</node> -->
+  	</node>
 
 	<!-- SICK LMS100 Laser Range Finder -->
 	<node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" >
