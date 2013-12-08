@@ -18,7 +18,6 @@
 	<!-- PointGrey Flea3 GigE Cameras -->
 	<!-- <group ns="stereo">
 		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
-			<!-- <param name="use_software_trigger" value="true" /> -->
 			<param name="ip_address" value="192.168.4.11" />
 			<param name="frame_id" value="left_camera" />
 		</node>
