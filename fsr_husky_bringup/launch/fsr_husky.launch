@@ -13,6 +13,7 @@
 	<node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
 		<param name="device" value="/dev/mti_300" />
 		<param name="baudrate" value="115200" />
+		<param name="frame_id" value="base_imu" />
 	</node>
 
 	<!-- PointGrey Flea3 GigE Cameras -->
