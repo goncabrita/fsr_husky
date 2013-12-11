@@ -1,0 +1,14 @@
+#!/bin/bash
+source `rospack find rosbash`/rosbash
+
+# Install the udev rules.
+rospd fsr_husky_bringup/rules > /dev/null
+echo "Installing udev rules."
+sudo cp husky.rules /etc/udev/rules.d/
+popd > /dev/null
+sudo udevadm trigger
+
+# Install the launch script
+echo "Installing launch script."
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+sudo sed -i "s|exit 0|su - "${USER}" -c "${SCRIPTPATH}"/launch\nexit 0|1" /etc/rc.local

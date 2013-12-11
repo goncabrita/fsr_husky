@@ -1,13 +1,27 @@
 <launch>
- 
-	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
-		<rosparam file="$(find fsr_husky_bringup)/settings//costmap_common_params.yaml" command="load" ns="global_costmap" />
-		<rosparam file="$(find fsr_husky_bringup)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-		<rosparam file="$(find fsr_husky_bringup)/config/local_costmap_params.yaml" command="load" />
-		<rosparam file="$(find fsr_husky_bringup)/config/global_costmap_params.yaml" command="load" />
-		<rosparam file="$(find fsr_husky_bringup)/config/base_local_planner_params.yaml" command="load" />
+	<!-- Args -->
+	<arg name="map_file" default="$(find isr_resources)/maps/lse_balcony.yaml"/>
+	<arg name="initial_pose_x" default="0.0"/>
+  	<arg name="initial_pose_y" default="0.0"/>
+  	<arg name="initial_pose_a" default="0.0"/>
+	<arg name="cmd_vel_topic" default="cmd_vel" />
+	<arg name="odom_topic" default="odom" />
 
- 	 </node>
+	<!-- Map server -->
+  	<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+	<!-- AMCL -->
+  	<include file="$(find husky_navigation)/launch/amcl.launch.xml">
+	    	<arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+	    	<arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    		<arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  	</include>
+
+	<!-- Move Base -->
+	<include file="$(find fsr_husky_bringup)/launch/includes/move_base.launch.xml">
+		<arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
+    		<arg name="odom_topic" value="$(arg odom_topic)"/>
+	</include>
 
 </launch>

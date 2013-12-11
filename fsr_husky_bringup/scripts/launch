@@ -1,0 +1,24 @@
+#!/bin/bash
+
+source /opt/ros/hydro/setup.bash
+source /home/${USER}/fsr_husky_workspace/devel/setup.bash
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+
+screen -dmS roscore ${SCRIPTPATH}"/roscore.sh"
+
+# Launch the robot with the mine detection sensor suit
+if [ -e /dev/mti_300 -a -e /dev/gps -a -e /dev/prolific -a -e /dev/ptu_d46 -a -e /dev/input/js0 -a -e /dev/metal_detector ]
+then
+	screen -dmS husky ${SCRIPTPATH}"/roslaunch.sh fsr_husky_mine_detection"
+
+# Launch the robot with the basic sensor suit
+elif [ -e /dev/mti_300 -a -e /dev/gps -a -e /dev/prolific -a -e /dev/ptu_d46 -a -e /dev/input/js0 ]
+then
+	screen -dmS husky ${SCRIPTPATH}"/roslaunch.sh fsr_husky"
+
+# Launch the robot with the teleop node
+elif [ -e /dev/prolific -a -e /dev/input/js0 ]
+then
+	screen -dmS husky ${SCRIPTPATH}"/roslaunch.sh husky_teleop"
+fi

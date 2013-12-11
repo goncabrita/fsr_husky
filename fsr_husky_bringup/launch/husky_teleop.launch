@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- Clearpath Husky Robot -->
+	<include file="$(find husky_base)/launch/base.launch" />
+
+	<!-- Teleoperation -->
+	<include file="$(find fsr_husky_teleop)/launch/xbox360_teleop.launch" />	
+
+</launch>
