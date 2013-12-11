@@ -11,4 +11,4 @@ sudo udevadm trigger
 # Install the launch script
 echo "Installing launch script."
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-sudo sed -i "s|exit 0|su - "${USER}" -c "${SCRIPTPATH}"/launch\nexit 0|2" /etc/rc.local
+sudo sed -i "/ # /! s|exit 0|su - "${USER}" -c "${SCRIPTPATH}"/launch\nexit 0|" /etc/rc.local
