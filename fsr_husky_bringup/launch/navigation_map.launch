@@ -1,5 +1,7 @@
 <launch>
 
+	<arg name="arm_is_installed" default="false" />
+
 	<!-- Args -->
 	<arg name="map_file" default="$(find isr_resources)/maps/lse_balcony.yaml"/>
 	<arg name="initial_pose_x" default="0.0"/>

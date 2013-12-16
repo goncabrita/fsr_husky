@@ -1,5 +1,7 @@
 <launch>
 
+	<arg name="arm_is_installed" default="false" />
+
 	<!-- GMapping -->
 	<include file="$(find husky_navigation)/launch/gmapping.launch.xml"/>
 
