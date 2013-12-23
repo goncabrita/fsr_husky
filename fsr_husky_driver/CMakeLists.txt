@@ -4,10 +4,10 @@ project(fsr_husky_driver)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib)
+find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -33,11 +33,16 @@ find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_por
 #   Service2.srv
 # )
 
+add_action_files(
+   DIRECTORY action
+   FILES Home.action Goto.action
+ )
+
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+   DEPENDENCIES
+   actionlib_msgs  sensor_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -52,7 +57,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES fsr_husky_driver
 #  CATKIN_DEPENDS laser_assembler roscpp
-#  DEPENDS system_lib
+  DEPENDS actionlib_msgs
 )
 
 ###########
@@ -63,8 +68,10 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${cereal_port_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -75,14 +82,18 @@ include_directories(
 ## Declare a cpp executable
 add_executable(pointcloud_generator src/pointcloud_generator/pointcloud_generator.cpp)
 add_executable(fsr_husky_arm_node src/mine_clearance_arm/fsr_husky_arm_node.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
+add_executable(home_node src/mine_clearance_arm/home_node.cpp)
+add_executable(sweep_node src/mine_clearance_arm/sweep_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(fsr_husky_driver_node fsr_husky_driver_generate_messages_cpp)
+add_dependencies(fsr_husky_arm_node fsr_husky_driver_gen_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(pointcloud_generator ${catkin_LIBRARIES})
 target_link_libraries(fsr_husky_arm_node ${catkin_LIBRARIES} cereal_port)
+target_link_libraries(home_node ${catkin_LIBRARIES})
+target_link_libraries(sweep_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
