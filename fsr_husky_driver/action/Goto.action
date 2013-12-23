@@ -1,0 +1,8 @@
+# goal
+sensor_msgs/JointState joint
+---
+# result
+sensor_msgs/JointState joint
+---
+# feedback
+sensor_msgs/JointState joint
