@@ -66,8 +66,8 @@
 
 	<!-- Mine Detection Arm -->
   	<node type="fsr_husky_arm_node" pkg="fsr_husky_driver" name="fsr_husky_arm" output="screen">
-    		<param name="linear_actuator_port" type="string" value="/dev/arm_linear" />
-    		<param name="rotation_actuator_port" type="string" value="/dev/arm_rotation" />
+    		<param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if00" />
+    		<param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02" />
   	</node>
 
 	<!-- Metal Detector -->
