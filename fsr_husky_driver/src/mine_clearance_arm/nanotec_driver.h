@@ -37,6 +37,10 @@ public:
     bool startMotor();
     bool stopMotor();
 
+    bool ready_;
+    bool zero_;
+    bool error_;
+
 private:
     bool sendMessage(char* message, unsigned int message_size, char* reply, unsigned int& reply_size);
 

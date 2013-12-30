@@ -47,9 +47,9 @@ int main(int argc, char **argv)
     ros::NodeHandle pn("~");
 
     double min;
-    pn.param("min", min, -0.5236);
+    pn.param("min", min, -0.45);
     double max;
-    pn.param("max", max, 0.5236);
+    pn.param("max", max, 0.45);
     double height;
     pn.param("height", height, 0.05);
     double speed;

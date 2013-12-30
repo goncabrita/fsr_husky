@@ -26,21 +26,25 @@ bool JRK::init(std::string* port, int baudrate)
 bool JRK::getValue(int& value)
 {
     char data = 0xA7;
-    device_.write(&data);
+    device_.write(&data, 1);
 
+    int temp;
     char reply[2];
-    try{ device_.read(reply, 2, JRK_TIMEOUT); }
+    try{ temp = device_.readBytes(reply, 2, JRK_TIMEOUT); }
     catch(cereal::TimeoutException& e)
     {
         return false;
     }
-    value = reply[0] + 256*reply[1];
+    //printf("Num of bytes:%d %#X %#X\n", temp, reply[0], reply[1]);
+    value = reply[1] & 0xFF;
+    value <<= 8;
+    value += reply[0] & 0xFF;
     return true;
 }
 
 bool JRK::setPosition(int position)
 {
-    printf("Position %d\n", position);
+    //printf("Position %d\n", position);
 
     if(position < JRK_MIN_POSITION) position = JRK_MIN_POSITION;
     if(position > JRK_MAX_POSITION) position = JRK_MAX_POSITION;

@@ -77,7 +77,7 @@ FSRHuskyArm::FSRHuskyArm(ros::NodeHandle& node_handle, ros::NodeHandle& private_
 
     m_private_node.param("goal_tolerance", goal_tolerance_, 0.01);
     double timeout;
-    m_private_node.param("timeout", timeout, 20.0);
+    m_private_node.param("timeout", timeout, 60.0);
     timeout_ = ros::Duration(timeout);
 }
 
@@ -117,7 +117,7 @@ void FSRHuskyArm::init()
     }
 
     bool go_home;
-    m_private_node.param("home_at_startup", go_home, false);
+    m_private_node.param("home", go_home, false);
     if(go_home)
     {
         if(!home())
@@ -139,19 +139,27 @@ bool FSRHuskyArm::home(double timeout)
 {
     ROS_INFO("FSR Husky Arm - %s - Starting homing...", __FUNCTION__);
 
+    if(!nanotec.setDirection(NANOTEC_LEFT))
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to change the direction!", __FUNCTION__);
+        return false;
+    }
+
     if(!nanotec.startHoming())
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to start the homing routine!", __FUNCTION__);
         return false;
     }
 
-    ros::Rate r(10.0);
+    ros::Rate r(2.0);
     ros::Time start_time = ros::Time::now();
-    while(nanotec.getStatus() != NANOTEC_STATUS_ZERO && ros::Time::now() - start_time < ros::Duration(timeout))
+    nanotec.getStatus();
+    while(!nanotec.zero_ && ros::Time::now() - start_time < ros::Duration(timeout) && ros::ok())
     {
         r.sleep();
+        nanotec.getStatus();
     }
-    if(nanotec.getStatus() != NANOTEC_STATUS_ZERO)
+    if(!nanotec.zero_)
     {
         ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could complete the homing routine!", __FUNCTION__);
         return false;
@@ -170,17 +178,27 @@ bool FSRHuskyArm::home(double timeout)
         ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
         return false;
     }
+    ros::Duration(1.0).sleep();
+    if(!nanotec.setPosition(5000))
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        return false;
+    }
 
     start_time = ros::Time::now();
-    while(nanotec.getStatus() != NANOTEC_STATUS_LIMIT && ros::Time::now() - start_time < ros::Duration(timeout))
+    nanotec.getStatus();
+    while(!nanotec.error_ && ros::Time::now() - start_time < ros::Duration(timeout) && ros::ok())
     {
         r.sleep();
+        nanotec.getStatus();
     }
-    if(nanotec.getStatus() != NANOTEC_STATUS_LIMIT)
+    if(!nanotec.error_)
     {
         ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could complete the homing routine!", __FUNCTION__);
         return false;
     }
+
+    ros::Duration(1.0).sleep();
 
     if(!nanotec.clearPositionError())
     {
@@ -194,6 +212,12 @@ bool FSRHuskyArm::home(double timeout)
         return false;
     }
     ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_position_);
+
+    if(!nanotec.setPosition(max_position_/2))
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        return false;
+    }
 
     ROS_INFO("FSR Husky Arm - %s - Homing complete!", __FUNCTION__);
 
@@ -224,6 +248,7 @@ void FSRHuskyArm::update()
         ROS_WARN("FSR Husky Arm - %s - Failed to update the position of the linear actuator!", __FUNCTION__);
         return;
     }
+    //ROS_INFO("linear position:%d", linear_position);
     ros::Duration delta_t = ros::Time::now() - last_update_;
     linear_position_ = linear_position*(max_linear_position_ - min_linear_position_)/4048 + min_linear_position_;
     linear_speed_ = (linear_position_ - last_linear_position_)/delta_t.toSec();
@@ -294,10 +319,17 @@ void FSRHuskyArm::asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal)
 
     ros::Time start_time = ros::Time::now();
 
-    double goal_l = goal->joint.position[0];
-    double goal_a = goal->joint.position[1];
     double peed_l = goal->joint.velocity[0];
+    double l = goal->joint.position[0];
+    if(l < min_linear_position_) l = min_linear_position_;
+    if(l > max_linear_position_) l = max_linear_position_;
+    int goal_l = (l - min_linear_position_)*4048/(max_linear_position_ - min_linear_position_);
+
     double speed_a = goal->joint.velocity[1];
+    double a = goal->joint.position[1];
+    if(a < min_angular_position_) a = min_angular_position_;
+    if(a > max_angular_position_) a = max_angular_position_;
+    int goal_a = (a - min_angular_position_)*max_position_/(max_angular_position_ - min_angular_position_);
 
     jrk.setPosition(goal_l);
     nanotec.setPosition(goal_a);
@@ -338,7 +370,9 @@ void FSRHuskyArm::asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal)
             break;
         }
 
-        if( fabs(goal->joint.position[0] - linear_position_) <= goal_tolerance_  && fabs(goal->joint.position[1] - angular_position_) <= goal_tolerance_ )
+        //ROS_INFO("[DEBUG] goal:%lf position:%lf tolerance:%lf", goal->joint.position[1], angular_position_, goal_tolerance_);
+        //ROS_INFO("[DEBUG] goal:%lf position:%lf tolerance:%lf", goal->joint.position[0], linear_position_, goal_tolerance_);
+        if( fabs(goal->joint.position[0] - linear_position_) <= goal_tolerance_*4.0  && fabs(goal->joint.position[1] - angular_position_) <= goal_tolerance_ )
         {
             fsr_husky_driver::GotoResult result;
             result.joint = joint_state;
@@ -367,8 +401,8 @@ int main(int argc, char** argv)
     FSRHuskyArm arm(n, pn);
     arm.init();
 
-    int rate;
-    pn.param("rate", rate, 20);
+    double rate;
+    pn.param("rate", rate, 20.0);
     ros::Rate r(rate);
 
     while(ros::ok())

@@ -167,6 +167,11 @@ int Nanotec::getStatus()
 
     int status;
     sscanf(reply, "001$%d", &status);
+
+    ready_ = status & 0x01;
+    zero_ = (status >> 1) & 0x01;
+    error_ = (status >> 2) & 0x01;
+
     return status;
 }
 
