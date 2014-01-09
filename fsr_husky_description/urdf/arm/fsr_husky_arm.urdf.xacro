@@ -232,6 +232,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <joint
     name="metal_detector_arm_joint"
     type="revolute">
+    <mimic
+      joint="upper_arm_joint"
+      multiplier="-1" />
     <origin
       xyz="0 0 0.8475"
       rpy="1.5708 -1.5708 0" />
@@ -343,6 +346,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <joint
     name="lower_arm_joint"
     type="revolute">
+    <mimic
+      joint="upper_arm_joint" />
     <origin
       xyz="0 0.0809 -0.011058"
       rpy="-1.5708 0 -1.5708" />
