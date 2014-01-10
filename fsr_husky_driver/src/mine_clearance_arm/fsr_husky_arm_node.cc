@@ -8,7 +8,7 @@
 
 #include <actionlib/server/simple_action_server.h>
 #include <fsr_husky_driver/HomeAction.h>
-#include <fsr_husky_driver/GotoAction.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
 
 class FSRHuskyArm
 {
@@ -24,8 +24,8 @@ class FSRHuskyArm
         actionlib::SimpleActionServer<fsr_husky_driver::HomeAction> m_as_home_;
         void asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req);
 
-        actionlib::SimpleActionServer<fsr_husky_driver::GotoAction> m_as_goto_;
-        void asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal);
+        actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> m_as_goto_;
+        void asGotoCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal);
 
     private:
         JRK jrk;
@@ -313,13 +313,15 @@ void FSRHuskyArm::asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req)
     }
 }
 
-void FSRHuskyArm::asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal)
+void FSRHuskyArm::asGotoCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
 {
     ros::Rate loop_rate(10.0);
 
     ros::Time start_time = ros::Time::now();
 
-    double peed_l = goal->joint.velocity[0];
+
+
+    double speed_l = goal->trajectory.points[i].  joint.velocity[0];
     double l = goal->joint.position[0];
     if(l < min_linear_position_) l = min_linear_position_;
     if(l > max_linear_position_) l = max_linear_position_;

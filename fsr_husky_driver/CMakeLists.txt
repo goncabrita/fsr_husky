@@ -4,7 +4,7 @@ project(fsr_husky_driver)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs)
+find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs control_msgs)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -35,7 +35,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 add_action_files(
    DIRECTORY action
-   FILES Home.action Goto.action
+   FILES Home.action
  )
 
 ## Generate added messages and services with any dependencies listed here
@@ -87,7 +87,6 @@ add_executable(sweep_node src/mine_clearance_arm/sweep_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(fsr_husky_arm_node fsr_husky_driver_gen_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(pointcloud_generator ${catkin_LIBRARIES})
