@@ -66,6 +66,8 @@ class FSRHuskyArm
 
         double goal_tolerance_;
         ros::Duration timeout_;
+
+        bool homing_;
 };
 
 FSRHuskyArm::FSRHuskyArm(ros::NodeHandle& node_handle, ros::NodeHandle& private_node_handle) : jrk(), m_node(node_handle), m_private_node(private_node_handle),
