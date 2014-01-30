@@ -447,15 +447,15 @@ Visualization Manager:
       Class: rviz/XYOrbit
       Distance: 2.59895
       Focal Point:
-        X: 0.443115
-        Y: 0.0662526
+        X: 0.457765
+        Y: 0.0630845
         Z: 2.83122e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.239797
+      Pitch: 0.364797
       Target Frame: base_footprint
       Value: XYOrbit (rviz)
-      Yaw: 1.34176
+      Yaw: 1.36676
     Saved: ~
 Window Geometry:
   Displays:

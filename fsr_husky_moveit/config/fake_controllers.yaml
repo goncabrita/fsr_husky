@@ -1,8 +1,8 @@
 controller_list:
+  - name: fake_metal_detector_controller
+    joints:
+      []
   - name: fake_mine_detection_arm_controller
     joints:
       - arm_axel_joint
       - upper_arm_joint
-  - name: fake_metal_detector_controller
-    joints:
-      []

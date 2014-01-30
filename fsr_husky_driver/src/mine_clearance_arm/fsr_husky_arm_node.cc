@@ -90,7 +90,7 @@ void FSRHuskyArm::init()
 {
     // Query for serial configuration
     std::string linear_port;
-    m_private_node.param<std::string>("linear_actuator_port", linear_port, "/dev/ttyACM0");
+    m_private_node.param<std::string>("linear_actuator_port", linear_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if00");
     int linear_baudrate;
     m_private_node.param("linear_actuator_baudrate", linear_baudrate, 115200);
 
@@ -98,7 +98,7 @@ void FSRHuskyArm::init()
     m_private_node.param("max_linear_position", max_linear_position_, 0.5236);
 
     std::string rotation_port;
-    m_private_node.param<std::string>("rotation_actuator_port", rotation_port, "/dev/ttyACM1");
+    m_private_node.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02");
     int rotation_baudrate;
     m_private_node.param("rotation_actuator_baudrate", rotation_baudrate, 115200);
 
