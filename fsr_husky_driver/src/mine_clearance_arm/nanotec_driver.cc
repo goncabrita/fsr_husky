@@ -34,7 +34,7 @@ bool Nanotec::sendMessage(char* message, unsigned int message_size, char* reply,
     }
     data[message_size+2] = '\r';
 
-    //printf("[REQUEST] %s\n", data);
+    printf("[REQUEST] %s\n", data);
 
     device_.write(data, message_size+3);
 
@@ -45,7 +45,7 @@ bool Nanotec::sendMessage(char* message, unsigned int message_size, char* reply,
     }
     reply[reply_size] = 0;
 
-    //printf("[REPLY] %s\n", reply);
+    printf("[REPLY] %s\n", reply);
 
     return true;
 }
