@@ -175,7 +175,7 @@ bool FSRHuskyArm::home(double timeout)
         return false;
     }
 
-    ros::Duration(1.0).sleep();
+    ros::Duration(3.0).sleep();
 
     if(!nanotec.setPositionMode())
     {
@@ -221,13 +221,13 @@ bool FSRHuskyArm::home(double timeout)
     }
     ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_position_);
 
+    ros::Duration(3.0).sleep();
+
     if(!nanotec.setPositionMode())
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to switch to absolute position mode!", __FUNCTION__);
         return false;
     }
-
-    ros::Duration(1.0).sleep();
 
     if(!nanotec.setPosition(max_position_/2))
     {
