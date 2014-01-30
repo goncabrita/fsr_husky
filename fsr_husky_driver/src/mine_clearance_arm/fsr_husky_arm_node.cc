@@ -135,6 +135,7 @@ void FSRHuskyArm::init()
     m_actuator_pub = m_node.advertise<sensor_msgs::JointState>("actuator_states", 10);
     m_joint_sub = m_node.subscribe<sensor_msgs::JointState>("cmd", 10, &FSRHuskyArm::setGoal, this);
 
+    homing_ = false;
     m_as_home_.start();
     m_as_goto_.start();
 
@@ -147,6 +148,8 @@ void FSRHuskyArm::init()
 
 bool FSRHuskyArm::home(double timeout)
 {
+    homing_ = true;
+
     ROS_INFO("FSR Husky Arm - %s - Starting homing...", __FUNCTION__);
 
     if(!nanotec.setDirection(NANOTEC_LEFT))
@@ -185,13 +188,13 @@ bool FSRHuskyArm::home(double timeout)
 
     if(!nanotec.setPosition(5000))
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routineset position to search the other limit switch!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to set the possition to search for the other limit switch!", __FUNCTION__);
         return false;
     }
     ros::Duration(1.0).sleep();
     if(!nanotec.setPosition(5000))
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routineset position to search the other limit switch again!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to set the possition to search for the other limit switch again!", __FUNCTION__);
         return false;
     }
 
@@ -231,6 +234,7 @@ bool FSRHuskyArm::home(double timeout)
 
     ROS_INFO("FSR Husky Arm - %s - Homing complete!", __FUNCTION__);
 
+    homing_ = false;
     return true;
 }
 
@@ -252,6 +256,8 @@ void FSRHuskyArm::setGoal(const sensor_msgs::JointState::ConstPtr& msg)
 
 void FSRHuskyArm::update()
 {
+    if(homing_) return;
+
     int linear_position;
     if(!jrk.getPosition(linear_position))
     {
