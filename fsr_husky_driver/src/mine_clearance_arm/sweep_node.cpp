@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         goal.joint.position.resize(2);
         goal.joint.velocity.resize(2);
         goal.joint.name[0] = "arm_linear_joint";
-        goal.joint.position[0] = 0.0;
+        goal.joint.position[0] = height;
         goal.joint.velocity[0] = 0.0;
         goal.joint.name[1] = "arm_rotation_joint";
         goal.joint.position[1] = position = position == min ? max : min;

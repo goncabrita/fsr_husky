@@ -29,6 +29,8 @@ public:
     bool setPosition(int position);
     bool getPosition(int& position);
 
+    bool setSpeeds(int min_speed, int max_speed);
+
     bool startHoming();
 
     int getStatus();

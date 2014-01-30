@@ -140,6 +140,33 @@ bool Nanotec::getPosition(int& position)
     return true;
 }
 
+bool Nanotec::setSpeeds(int min_speed, int max_speed)
+{
+    char reply[NANOTEC_MSG_LEN];
+    unsigned int reply_size;
+
+    char message[32];
+
+    sprintf(message, "u=%d", min_speed);
+    if(!sendMessage(message, strlen(message), reply, reply_size))
+    {
+        return false;
+    }
+
+    sprintf(message, "o=%d", max_speed);
+    if(!sendMessage(message, strlen(message), reply, reply_size))
+    {
+        return false;
+    }
+
+    sprintf(message, "n=%d", max_speed);
+    if(!sendMessage(message, strlen(message), reply, reply_size))
+    {
+        return false;
+    }
+    return true;
+}
+
 bool Nanotec::startHoming()
 {
     char reply[NANOTEC_MSG_LEN];

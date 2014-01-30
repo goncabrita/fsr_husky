@@ -18,7 +18,7 @@ class FSRHuskyArm
         ~FSRHuskyArm();
 
         void init();
-        bool home(double timeout=30.0);
+        bool home(double timeout=120.0);
         void setGoal(const sensor_msgs::JointState::ConstPtr& msg);
         void update();
 
@@ -137,6 +137,12 @@ void FSRHuskyArm::init()
 
     m_as_home_.start();
     m_as_goto_.start();
+
+    if(!nanotec.setSpeeds(200, 400))
+    {
+        ROS_FATAL("FSR Husky Arm - %s - Failed to set the rotation actuator speeds!", __FUNCTION__);
+        ROS_BREAK();
+    }
 }
 
 bool FSRHuskyArm::home(double timeout)
@@ -202,8 +208,6 @@ bool FSRHuskyArm::home(double timeout)
         return false;
     }
 
-    ros::Duration(1.0).sleep();
-
     if(!nanotec.clearPositionError())
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
@@ -216,6 +220,14 @@ bool FSRHuskyArm::home(double timeout)
         return false;
     }
     ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_position_);
+
+    if(!nanotec.setPositionMode())
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to switch to absolute position mode!", __FUNCTION__);
+        return false;
+    }
+
+    ros::Duration(1.0).sleep();
 
     if(!nanotec.setPosition(max_position_/2))
     {
