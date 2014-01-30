@@ -171,7 +171,7 @@ bool FSRHuskyArm::home(double timeout)
     }
     if(!nanotec.zero_)
     {
-        ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could reach the first limit switch", __FUNCTION__);
         return false;
     }
 
@@ -185,13 +185,13 @@ bool FSRHuskyArm::home(double timeout)
 
     if(!nanotec.setPosition(5000))
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routineset position to search the other limit switch!", __FUNCTION__);
         return false;
     }
     ros::Duration(1.0).sleep();
     if(!nanotec.setPosition(5000))
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routineset position to search the other limit switch again!", __FUNCTION__);
         return false;
     }
 
@@ -204,7 +204,7 @@ bool FSRHuskyArm::home(double timeout)
     }
     if(!nanotec.error_)
     {
-        ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm could reach the second limit switch", __FUNCTION__);
         return false;
     }
 
@@ -212,13 +212,13 @@ bool FSRHuskyArm::home(double timeout)
 
     if(!nanotec.clearPositionError())
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to clear the position error!", __FUNCTION__);
         return false;
     }
 
     if(!nanotec.getPosition(max_position_))
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
+        ROS_ERROR("FSR Husky Arm - %s - Failed to get the position!", __FUNCTION__);
         return false;
     }
     ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_position_);
