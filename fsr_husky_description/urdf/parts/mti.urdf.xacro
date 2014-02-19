@@ -61,6 +61,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			<child link="base_imu"/>
 			<origin xyz="${x} ${y} ${z+mti_height/2}" rpy="${rx} ${ry} ${rz}" /> 
 		</joint>
+
+		<gazebo reference="mti">
+        		<material>Gazebo/Orange</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 		
 	</xacro:macro>
 </robot>

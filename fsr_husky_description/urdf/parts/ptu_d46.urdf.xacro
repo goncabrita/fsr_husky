@@ -60,6 +60,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
   		</link>
+		<gazebo reference="ptu_d46_base_link">
+        		<material>Gazebo/FlatBlack</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 
 		<joint name="ptu_d46_joint" type="fixed">
 			<parent link="${parent}"/>
@@ -93,6 +97,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
   		</link>
+		<gazebo reference="ptu_d46_pan_link">
+        		<material>Gazebo/FlatBlack</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
   
 		<joint name="ptu_d46_pan_joint" type="revolute">
     			<origin xyz="0.026 -0.0215 0.044" rpy="-6.123E-17 0 0" />
@@ -128,6 +136,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
   		</link>
+		<gazebo reference="ptu_d46_tilt_link">
+        		<material>Gazebo/FlatBlack</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
   
 		<joint name="ptu_d46_tilt_joint" type="revolute">
     			<origin xyz="0 0 0.0455" rpy="1.5708 0 0" />

@@ -62,6 +62,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
 		</link>
+		<gazebo reference="${prefix}_husky_bridge">
+	        	<material>Gazebo/Grey</material>
+	        	<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 
 		<joint name="joint_${prefix}_husky_bridge" type="fixed">
 			<parent link="${parent}"/>

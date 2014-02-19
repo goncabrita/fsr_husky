@@ -58,6 +58,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
   		</link>
+		<gazebo reference="alfa_tube2h">
+        		<material>Gazebo/White</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 
 		<joint name="joint_alfa_tub2h" type="fixed">
 			<parent link="${parent}"/>
@@ -80,6 +84,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				</geometry>
     			</collision>
   		</link>
+		<gazebo reference="wifi_antenna">
+        		<material>Gazebo/White</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 
 		<joint name="joint_wifi_anetnna" type="fixed">
 			<parent link="alfa_tube2h"/>

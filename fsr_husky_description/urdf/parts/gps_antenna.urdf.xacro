@@ -69,6 +69,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
      			 	</geometry>
     			</collision>
   		</link>
+		<gazebo reference="gps_antenna">
+        		<material>Gazebo/White</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
 
 		<joint name="gps_anetnna_joint" type="fixed">
 			<parent link="${parent}"/>

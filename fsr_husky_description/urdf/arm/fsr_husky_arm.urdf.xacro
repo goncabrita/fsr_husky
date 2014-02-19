@@ -26,7 +26,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="fsr_husky_arm">
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+	xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+	xmlns:xacro="http://ros.org/wiki/xacro" name="fsr_husky_arm">
 <xacro:macro name="fsr_husky_arm" params="parent x y z rx ry rz"> 
   <link
     name="base_arm_link">
@@ -68,11 +71,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="base_arm_link">
+        <material>Gazebo/Grey</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint name="arm_joint" type="fixed">
 			<parent link="${parent}"/>
 			<child link="base_arm_link"/>
 			<origin xyz="${x} ${y} ${z}" rpy="${rx} ${ry} ${rz}" /> 
   </joint>
+
   <link
     name="arm_axel">
     <inertial>
@@ -113,6 +122,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="arm_axel">
+        <material>Gazebo/Grey</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint
     name="arm_axel_joint"
     type="revolute">
@@ -131,6 +145,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       effort="0"
       velocity="0" />
   </joint>
+
   <link
     name="upper_arm">
     <inertial>
@@ -171,6 +186,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="upper_arm">
+        <material>Gazebo/Grey</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint
     name="upper_arm_joint"
     type="revolute">
@@ -189,6 +209,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       effort="0"
       velocity="0" />
   </joint>
+
   <link
     name="metal_detector_arm">
     <inertial>
@@ -229,6 +250,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="metal_detector_arm">
+        <material>Gazebo/Grey</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint
     name="metal_detector_arm_joint"
     type="revolute">
@@ -250,6 +276,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       effort="0"
       velocity="0" />
   </joint>
+
   <link
     name="metal_detector_antenna">
     <inertial>
@@ -290,6 +317,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="metal_detector_antenna">
+        <material>Gazebo/Green</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint
     name="metal_detector_antenna_joint"
     type="fixed">
@@ -303,6 +335,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 0 0" />
   </joint>
+
   <link
     name="lower_arm">
     <inertial>
@@ -343,6 +376,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </geometry>
     </collision>
   </link>
+  <gazebo reference="lower_arm">
+        <material>Gazebo/Grey</material>
+        <turnGravityOff>true</turnGravityOff>
+    </gazebo>
+
   <joint
     name="lower_arm_joint"
     type="revolute">
