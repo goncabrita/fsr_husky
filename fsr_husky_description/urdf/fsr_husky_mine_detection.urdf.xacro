@@ -47,15 +47,16 @@ Husky A200 modified by the ISR University of Coimbra
     xmlns:xacro="http://ros.org/wiki/xacro" name="husky">
        
     <!-- Included URDF/XACRO Files -->
-    <xacro:include filename="$(find husky_description)/urdf/materials.urdf.xacro" />
-    <xacro:include filename="$(find husky_description)/urdf/wheel.urdf.xacro" />
-    <xacro:include filename="$(find husky_description)/urdf/parts.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/husky_bridge.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/sick_lms100.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/alfa_tube2h.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/pointgrey_flea3.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/gps_antenna.urdf.xacro" />
-    <xacro:include filename="$(find fsr_husky_description)/urdf/parts/ptu_d46.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/husky_parts/materials.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/husky_parts/wheel.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/husky_parts/parts.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/husky_bridge.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/sick_lms100.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/alfa_tube2h.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/pointgrey_flea3.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/gps_antenna.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/ptu_d46.urdf.xacro" />
+    <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/mti.urdf.xacro" />
     <xacro:include filename="$(find fsr_husky_description)/urdf/arm/fsr_husky_arm.urdf.xacro" />
 
     <!-- PROPERTY LIST -->
@@ -87,13 +88,14 @@ Husky A200 modified by the ISR University of Coimbra
     <!-- BASE-FOOTPRINT -->
     <!-- base_footprint is a fictitious link(frame) that is on the ground right below base_link origin, navigation stack depends on this frame -->
     <link name="base_footprint">
-        <inertial>
+        <!--<inertial>
             <mass value="0.0001" />
             <origin xyz="0 0 0" />
             <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
                 iyy="0.0001" iyz="0.0" 
                 izz="0.0001" />
-        </inertial>
+	      </inertial>-->
+
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
@@ -103,7 +105,6 @@ Husky A200 modified by the ISR University of Coimbra
     </link>
 
     <gazebo reference="base_footprint">
-        <material>Gazebo/Green</material>
         <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
@@ -124,13 +125,15 @@ Husky A200 modified by the ISR University of Coimbra
             <inertia ixx="${base_ixx_com_cs}" ixy="${base_ixy_com_cs}" ixz="${base_ixz_com_cs}"
                 iyy="${base_iyy_com_cs}" iyz="${base_iyz_com_cs}" izz="${base_izz_com_cs}" /> 
         </inertial>
+        
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://husky_description/meshes/base_link.stl" />
+		<mesh filename="package://fsr_husky_description/models/husky_parts/base_link.stl" />
             </geometry>
             <material name="Black" />
         </visual>
+    
 		<collision>
 			<origin xyz="0 0 ${wheel_x_size/2 - base_z_origin_to_wheel_origin - 0.02}" rpy="0 0 0 " />
 			<geometry>
@@ -138,27 +141,25 @@ Husky A200 modified by the ISR University of Coimbra
 			</geometry>
 		</collision>     
     </link>
-
     <gazebo reference="base_link">
         <material>Gazebo/FlatBlack</material>
         <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
     <!-- WHEEL macros -->
-    <husky_wheel fb="back" lr="left" parent="base_link" translateX="-1" translateY="1" flipY="-1"/>
-    <husky_wheel fb="back" lr="right" parent="base_link" translateX="-1" translateY="-1" flipY="-1"/>
-    <husky_wheel fb="front" lr="left" parent="base_link" translateX="1" translateY="1" flipY="-1"/>
-    <husky_wheel fb="front" lr="right" parent="base_link" translateX="1" translateY="-1" flipY="-1"/>
+	<husky_wheel fb="back" lr="left" parent="base_link" translateX="-1" translateY="1" flipY="-1"/>
+	<husky_wheel fb="back" lr="right" parent="base_link" translateX="-1" translateY="-1" flipY="-1"/>
+	<husky_wheel fb="front" lr="left" parent="base_link" translateX="1" translateY="1" flipY="-1"/>
+	<husky_wheel fb="front" lr="right" parent="base_link" translateX="1" translateY="-1" flipY="-1"/>
 
     <!-- DECORATIONS -->
-   <!-- Top Plate -->
+    <!-- Top Plate -->
     <husky_part parent="base_footprint" name="top_plate" mesh="top_plate" 
           colour="Yellow"
           translateX="0.0" translateY="0.0" translateZ="${wheel_x_size/2 - base_z_origin_to_wheel_origin}" 
           rotateX="0.0" rotateY="0.0" rotateZ="0.0"/>
     <gazebo reference="base_footprint_top_plate_part">
         <material>Gazebo/Yellow</material>
-	<turnGravityOff>false</turnGravityOff>
     </gazebo>
 
     <!-- User Rail -->
@@ -168,7 +169,6 @@ Husky A200 modified by the ISR University of Coimbra
           rotateX="0.0" rotateY="0.0" rotateZ="0.0"/>
     <gazebo reference="base_footprint_user_rail_part">
         <material>Gazebo/Grey</material>
-	<turnGravityOff>false</turnGravityOff>
     </gazebo>
 
     <!-- Bumpers -->
@@ -178,7 +178,6 @@ Husky A200 modified by the ISR University of Coimbra
           rotateX="0.0" rotateY="0.0" rotateZ="0.0"/>
     <gazebo reference="base_footprint_front_bumper_part">
         <material>Gazebo/FlatBlack</material>
-	<turnGravityOff>false</turnGravityOff>
     </gazebo>
     <husky_part parent="base_footprint" name="rear_bumper" mesh="bumper"
           colour="DarkGray"
@@ -186,7 +185,6 @@ Husky A200 modified by the ISR University of Coimbra
           rotateX="0.0" rotateY="0.0" rotateZ="3.14"/>
     <gazebo reference="base_footprint_rear_bumper_part">
         <material>Gazebo/FlatBlack</material>
-	<turnGravityOff>false</turnGravityOff>
     </gazebo>
 
     <gazebo>

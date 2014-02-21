@@ -49,14 +49,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<visual>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/ptu_d46_base_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_base_link.stl" />
      	 			</geometry>
       				<material name="DarkGray" />
     			</visual>
     			<collision>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/ptu_d46_base_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_base_link.stl" />
       				</geometry>
     			</collision>
   		</link>
@@ -86,14 +86,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<visual>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/ptu_d46_pan_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_pan_link.stl" />
       				</geometry>
       				<material name="DarkGray" />
     			</visual>
     			<collision>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-					<mesh filename="package://fsr_husky_description/models/ptu_d46_pan_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_pan_link.stl" />
       				</geometry>
     			</collision>
   		</link>
@@ -107,7 +107,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<parent link="ptu_d46_base_link" />
     			<child link="ptu_d46_pan_link" />
     			<axis xyz="0 0 -1" />
-    			<limit effort="0" lower="-0.5" upper="0.5" velocity="0" />
+    			<limit effort="6.0" lower="-0.5" upper="0.5" velocity="0.5" />
+			<dynamics damping="0.008" friction="0.6" />
   		</joint>
   
 		<link name="ptu_d46_tilt_link">
@@ -125,14 +126,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<visual>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/ptu_d46_tilt_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_tilt_link.stl" />
       				</geometry>
       				<material name="DarkGray" />
     			</visual>
     			<collision>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/ptu_d46_tilt_link.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_tilt_link.stl" />
       				</geometry>
     			</collision>
   		</link>
@@ -146,8 +147,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<parent link="ptu_d46_pan_link" />
     			<child link="ptu_d46_tilt_link" />
     			<axis xyz="-1 0 0" />
-    			<limit effort="0" lower="-0.5" upper="0.5" velocity="0" />
+    			<limit effort="6.0" lower="-0.5" upper="0.5" velocity="0.5" />
+			<dynamics damping="0.008" friction="0.6" />
   		</joint>
+		
+		<transmission name="pan">
+		  <type>transmission_interface/SimpleTransmission</type>
+		  <joint name="ptu_d46_pan_joint"/>
+		  <actuator name="pan_motor">
+		    <hardwareInterface>EffortJointInterface</hardwareInterface>
+		    <mechanicalReduction>1</mechanicalReduction>
+		  </actuator>
+		</transmission>
+
+		<transmission name="tilt">
+		  <type>transmission_interface/SimpleTransmission</type>
+		  <joint name="ptu_d46_tilt_joint"/>
+		  <actuator name="tilt_motor">
+		    <hardwareInterface>EffortJointInterface</hardwareInterface>
+		    <mechanicalReduction>1</mechanicalReduction>
+		  </actuator>
+		</transmission>
+		
+		<gazebo>
+		  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+		    <robotNamespace>/ptu_d46</robotNamespace>
+		  </plugin>
+		</gazebo>
 
 	</xacro:macro>
 </robot>

@@ -140,10 +140,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 -1 0" />
     <limit
-      lower="-15708"
-      upper="15708"
-      effort="0"
-      velocity="0" />
+      lower="-1.5708"
+      upper="1.5708"
+      effort="100"
+      velocity="0.5" />
   </joint>
 
   <link
@@ -204,10 +204,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-1"
-      upper="1"
-      effort="0"
-      velocity="0" />
+      lower="-0.5"
+      upper="0.25"
+      effort="20"
+      velocity="0.5" />
   </joint>
 
   <link
@@ -217,7 +217,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         xyz="0.00200170148149059 -0.0639004587205252 -0.0667324909004516"
         rpy="0 0 0" />
       <mass
-        value="0.730115545526703" />
+	value="0.00001" /><!--value="0.730115545526703" />-->
       <inertia
         ixx="0.00564260404067653"
         ixy="4.21272987506857E-05"
@@ -271,10 +271,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 0 -1" />
     <limit
-      lower="-1"
-      upper="1"
-      effort="0"
-      velocity="0" />
+      lower="-0.25"
+      upper="0.5"
+      effort="20"
+      velocity="0.5" />
   </joint>
 
   <link
@@ -284,7 +284,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         xyz="3.6833E-07 0.011468 -0.12477"
         rpy="0 0 0" />
       <mass
-        value="12.099" />
+	value="0.00001" /><!--value="12.099" />-->
       <inertia
         ixx="0.060468"
         ixy="-4.3221E-09"
@@ -396,10 +396,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 1 0" />
     <limit
-      lower="-1"
-      upper="1"
-      effort="0"
-      velocity="0" />
+      lower="-0.5"
+      upper="0.25"
+      effort="20"
+      velocity="0.5" />
   </joint>
+  
+  <transmission name="upper_lift">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="upper_arm_joint"/>
+    <actuator name="upper_lift_motor">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="lower_lift">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="lower_arm_joint"/>
+    <actuator name="lower_lift_motor">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="mirror_lift">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="metal_detector_arm_joint"/>
+    <actuator name="mirror_lift_motor">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="sweep">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="arm_axel_joint"/>
+    <actuator name="sweep_motor">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/arm</robotNamespace>
+    </plugin>
+  </gazebo>
+  
 </xacro:macro>
 </robot>

@@ -35,13 +35,13 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 add_action_files(
    DIRECTORY action
-   FILES Home.action
+   FILES Home.action Goto.action
  )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
-   actionlib_msgs  sensor_msgs
+   actionlib_msgs sensor_msgs
 )
 
 ###################################
@@ -93,6 +93,9 @@ target_link_libraries(pointcloud_generator ${catkin_LIBRARIES})
 target_link_libraries(fsr_husky_arm_node ${catkin_LIBRARIES} cereal_port)
 target_link_libraries(home_node ${catkin_LIBRARIES})
 target_link_libraries(sweep_node ${catkin_LIBRARIES})
+
+add_dependencies(pointcloud_generator ${catkin_EXPORTED_TARGETS})
+add_dependencies(fsr_husky_arm_node ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##

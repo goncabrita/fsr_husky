@@ -1,0 +1,23 @@
+arm:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+  
+  # Position Controllers ---------------------------------------
+  upper_lift_controller:
+    type: effort_controllers/JointPositionController
+    joint: upper_arm_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  lower_lift_controller:
+    type: effort_controllers/JointPositionController
+    joint: lower_arm_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  mirror_lift_controller:
+    type: effort_controllers/JointPositionController
+    joint: metal_detector_arm_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  sweep_controller:
+    type: effort_controllers/JointPositionController
+    joint: arm_axel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}

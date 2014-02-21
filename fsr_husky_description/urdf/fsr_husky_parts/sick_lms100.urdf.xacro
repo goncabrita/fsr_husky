@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	<!-- SICK LMS100-->
 
-	<xacro:include filename="$(find fsr_husky_description)/urdf/parts/common.xacro" />
+	<xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/common.xacro" />
 
 	<xacro:property name="laser_x" value="0.105" />
 	<xacro:property name="laser_y" value="0.102" />
@@ -46,13 +46,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			<visual>
 				<origin xyz="0 0 0" rpy="0 0 0" />
 				<geometry>
-					<mesh filename="package://fsr_husky_description/models/sick_lms100.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/sick_lms100.stl" />
 				</geometry>
 				<material name="DarkGray" />
   			</visual>
     			<collision>
       				<geometry>
-        				<mesh filename="package://fsr_husky_description/models/sick_lms100.stl" />
+					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/sick_lms100.stl" />
         				<!-- <box size="${laser_x} ${laser_y} ${laser_z}" /> -->
       				</geometry>
     			</collision>
@@ -88,12 +88,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         				<noise>
           					<type>gaussian</type>
           					<mean>0.0</mean>
-          					<stddev>0.01</stddev>
+          					<stddev>0.001</stddev>
         				</noise>
       				</ray>
-      				<plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_gpu_laser.so">
+      				<plugin name="gazebo_ros_laser" filename="libgazebo_ros_gpu_laser.so">
         				<topicName>scan</topicName>
-        				<frameName>sick_lsm100</frameName>
+        				<frameName>sick_lms100</frameName>
       				</plugin>
     			</sensor>
   		</gazebo>

@@ -29,43 +29,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
 	xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
 	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
-	xmlns:xacro="http://ros.org/wiki/xacro" name="mti">
+	xmlns:xacro="http://ros.org/wiki/xacro" name="alfa_tube2h">
 
-	<xacro:include filename="$(find fsr_husky_description)/urdf/parts/common.xacro" />
+	<!-- Alfa Tube 2H-->
 
-	<xacro:property name="mti_length" value="0.057" />
-	<xacro:property name="mti_width" value="0.042" />
-	<xacro:property name="mti_height" value="0.0235" />
+	<xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/common.xacro" />
 
-	<xacro:macro name="mti" params="parent x y z rx ry rz"> 
-  		<link name="base_imu">
-			<xacro:box_inertial x="${mti_length}"  y="${mti_width}" z="${mti_height}" mass="0.052" />
+	<xacro:property name="alfa_length" value="0.132" />
+	<xacro:property name="alfa_radius" value="0.019" />
+	<xacro:property name="antenna_length" value="0.45" />
+	<xacro:property name="antenna_radius" value="0.008" />
+
+	<xacro:macro name="alfa_tube2h" params="parent x y z rx ry rz"> 
+  		<link name="alfa_tube2h">
+			<xacro:cylinder_inertial radius="${alfa_radius}" length="${alfa_length}" mass="0.100" />
 			<visual>
       				<geometry>
-        				<box size="${mti_length} ${mti_width} ${mti_height}"/>
+        				<cylinder length="${alfa_length}" radius="${alfa_radius}"/>
       				</geometry>
 				<origin rpy="0 0 0" xyz="0 0 0"/>
-      				<material name="Orange">
-        				<color rgba="1 0.4 0 1"/>
+      				<material name="White">
+        				<color rgba="1 1 1 1"/>
       				</material>
     			</visual>
     			<collision>
       				<geometry>
-        				<box size="${mti_length} ${mti_width} ${mti_height}"/>
+        				<cylinder length="${alfa_length}" radius="${alfa_radius}"/>
       				</geometry>
     			</collision>
   		</link>
-
-		<joint name="base_imu_joint" type="fixed">
-			<parent link="${parent}"/>
-			<child link="base_imu"/>
-			<origin xyz="${x} ${y} ${z+mti_height/2}" rpy="${rx} ${ry} ${rz}" /> 
-		</joint>
-
-		<gazebo reference="mti">
-        		<material>Gazebo/Orange</material>
+		<gazebo reference="alfa_tube2h">
+        		<material>Gazebo/White</material>
         		<turnGravityOff>false</turnGravityOff>
     		</gazebo>
+
+		<joint name="joint_alfa_tub2h" type="fixed">
+			<parent link="${parent}"/>
+			<child link="alfa_tube2h"/>
+			<origin xyz="${x} ${y} ${z+alfa_length/2}" rpy="${rx} ${ry} ${rz}" /> 
+		</joint>
+
+		<link name="wifi_antenna">
+			<xacro:cylinder_inertial radius="${antenna_radius}" length="${antenna_length}" mass="0.100" />
+			<visual>
+      				<geometry>
+        				<cylinder length="${antenna_length}" radius="${antenna_radius}"/>
+      				</geometry>
+				<origin rpy="0 0 0" xyz="0 0 0"/>
+      				<material name="White"/>
+    			</visual>
+    			<collision>
+      				<geometry>
+        				<cylinder length="${antenna_length}" radius="${antenna_radius}"/>
+      				</geometry>
+    			</collision>
+  		</link>
+		<gazebo reference="wifi_antenna">
+        		<material>Gazebo/White</material>
+        		<turnGravityOff>false</turnGravityOff>
+    		</gazebo>
+
+		<joint name="joint_wifi_anetnna" type="fixed">
+			<parent link="alfa_tube2h"/>
+			<child link="wifi_antenna"/>
+			<origin xyz="0 0 ${alfa_length/2+antenna_length/2}" rpy="0 0 0" /> 
+		</joint>
 		
 	</xacro:macro>
 </robot>
