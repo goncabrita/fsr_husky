@@ -31,7 +31,7 @@
   
   # Pan and Tilt Controller -----------------------------------
   ptu_d46_controller:
-    type: effort_controllers/JointTrajectoryController
+    type: position_controllers/JointTrajectoryController
     joints:
       - ptu_d46_pan_joint
       - ptu_d46_tilt_joint
