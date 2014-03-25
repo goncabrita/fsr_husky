@@ -26,8 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-This program contains the description of the robot base model for the Clearpath 
-Husky A200 modified by the ISR University of Coimbra
+This program contains the description of the HRATC2014 Husky robot based on the original Clearpath 
+Husky A200 file and modified by the ISR University of Coimbra
 -->
 
 <robot 
@@ -57,7 +57,8 @@ Husky A200 modified by the ISR University of Coimbra
     <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/gps_antenna.urdf.xacro" />
     <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/ptu_d46.urdf.xacro" />
     <xacro:include filename="$(find fsr_husky_description)/urdf/fsr_husky_parts/mti.urdf.xacro" />
-    
+    <xacro:include filename="$(find fsr_husky_description)/urdf/arm/fsr_husky_arm.urdf.xacro" />
+
     <!-- PROPERTY LIST -->
     <!--All units in m-kg-s-radians unit system -->
     <property name="M_PI" value="3.1415926535897931" />
@@ -128,7 +129,7 @@ Husky A200 modified by the ISR University of Coimbra
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-                <mesh filename="package://husky_description/meshes/base_link.stl" />
+		<mesh filename="package://fsr_husky_description/models/husky_parts/base_link.stl" />
             </geometry>
             <material name="Black" />
         </visual>
@@ -187,8 +188,8 @@ Husky A200 modified by the ISR University of Coimbra
     </gazebo>
 
     <gazebo>
-	    <plugin name="husky_diff_controller" filename="libhusky_gazebo_plugins.so">
-		    <alwaysOn>true</alwaysOn>
+	<plugin name="husky_diff_controller" filename="libhusky_gazebo_plugins.so">
+	    <alwaysOn>true</alwaysOn>
             <updateRate>100.0</updateRate>
             <backLeftJoint>joint_back_left_wheel</backLeftJoint>
             <backRightJoint>joint_back_right_wheel</backRightJoint>
@@ -210,8 +211,8 @@ Husky A200 modified by the ISR University of Coimbra
     <mti parent="back_husky_bridge" x="0" y="0" z="0.0" rx="0" ry="0" rz="0" />
 
     <!-- CAMERA macros -->
-    <pointgrey_flea3 prefix="left" parent="front_husky_bridge" base_offset="-0.13" camera_offset="-0.05" camera_r="0" camera_p="0" camera_y="0" />
-    <pointgrey_flea3 prefix="right" parent="front_husky_bridge" base_offset="0.13" camera_offset="0.05" camera_r="0" camera_p="0" camera_y="0" />
+    <pointgrey_flea3 prefix="right" parent="front_husky_bridge" base_offset="-0.13" camera_offset="-0.05" camera_r="0" camera_p="0" camera_y="0" />
+    <pointgrey_flea3 prefix="left" parent="front_husky_bridge" base_offset="0.13" camera_offset="0.05" camera_r="0" camera_p="0" camera_y="0" />
 
     <!-- PTU-D46 macro -->
     <ptu_d46 parent="front_husky_bridge" x="0" y="-0.025" z="0" rx="0" ry="0" rz="1.5708" />
@@ -224,5 +225,11 @@ Husky A200 modified by the ISR University of Coimbra
 
     <!-- WiFi Antenna -->
     <alfa_tube2h parent="back_husky_bridge" x="0" y="-0.17" z="0" rx="0" ry="0" rz="0" />
-        
+    
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+	<!--<robotNamespace>/husky</robotNamespace>-->
+      </plugin>
+    </gazebo>
+  
 </robot>

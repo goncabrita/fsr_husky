@@ -284,7 +284,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         xyz="3.6833E-07 0.011468 -0.12477"
         rpy="0 0 0" />
       <mass
-	value="0.00001" /><!--value="12.099" />-->
+	value="12.099" />
       <inertia
         ixx="0.060468"
         ixy="-4.3221E-09"
@@ -335,6 +335,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <axis
       xyz="0 0 0" />
   </joint>
+  
+  <link name="left_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+  
+  <joint name="left_coil_joint" type="fixed">
+      <origin xyz="0.18 0 0" rpy="0 0 0" />
+      <parent link="metal_detector_antenna"/>
+      <child link="left_coil" />
+  </joint>
+  
+  <link name="middle_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+  
+  <joint name="middle_coil_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="metal_detector_antenna"/>
+      <child link="middle_coil" />
+  </joint>
+  
+  <link name="right_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+  
+  <joint name="right_coil_joint" type="fixed">
+      <origin xyz="-0.18 0 0" rpy="0 0 0" />
+      <parent link="metal_detector_antenna"/>
+      <child link="right_coil" />
+  </joint>
+
 
   <link
     name="lower_arm">
@@ -402,19 +448,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       velocity="0.5" />
   </joint>
   
-  <transmission name="upper_lift">
+  <transmission name="lift">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="upper_arm_joint"/>
-    <actuator name="upper_lift_motor">
+    <actuator name="lift_motor">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
   
-  <transmission name="lower_lift">
+  <transmission name="mimic_lift">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="lower_arm_joint"/>
-    <actuator name="lower_lift_motor">
+    <actuator name="mimic_lift_motor">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
@@ -439,9 +485,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </transmission>
   
   <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/arm</robotNamespace>
-    </plugin>
+	<plugin name="mimic_plugin1" filename="libmimic_plugin.so">
+            <joint>upper_arm_joint</joint>
+            <mimicJoint>lower_arm_joint</mimicJoint>
+            <multiplier>1.0</multiplier>
+        </plugin>
+  </gazebo>
+  
+  <gazebo>
+	<plugin name="mimic_plugin2" filename="libmimic_plugin.so">
+            <joint>upper_arm_joint</joint>
+            <mimicJoint>metal_detector_arm_joint</mimicJoint>
+            <multiplier>-1.0</multiplier>
+        </plugin>
   </gazebo>
   
 </xacro:macro>

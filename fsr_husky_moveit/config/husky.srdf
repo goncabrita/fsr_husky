@@ -9,23 +9,28 @@
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="arm">
+        <link name="metal_detector_arm" />
+        <joint name="arm_axel_joint" />
+        <joint name="upper_arm_joint" />
+    </group>
     <group name="metal_detector">
         <link name="metal_detector_antenna" />
     </group>
-    <group name="mine_detection_arm">
-        <joint name="arm_axel_joint" />
-        <joint name="upper_arm_joint" />
-        <joint name="metal_detector_arm_joint" />
-    </group>
+    <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+    <group_state name="home" group="arm">
+        <joint name="arm_axel_joint" value="0" />
+        <joint name="upper_arm_joint" value="0" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="metal_detector" parent_link="metal_detector_arm" group="metal_detector" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="virtual_joint" type="planar" parent_frame="odom_combined" child_link="base_footprint" />
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="base_footprint" child_link="base_link" />
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
-    <passive_joint name="joint_front_left_wheel" />
     <passive_joint name="joint_front_right_wheel" />
-    <passive_joint name="joint_back_left_wheel" />
+    <passive_joint name="joint_front_left_wheel" />
     <passive_joint name="joint_back_right_wheel" />
+    <passive_joint name="joint_back_left_wheel" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="alfa_tube2h" link2="arm_axel" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="back_husky_bridge" reason="Adjacent" />
@@ -37,6 +42,7 @@
     <disable_collisions link1="alfa_tube2h" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="base_imu" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="base_link" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="front_left_wheel" reason="Never" />
@@ -45,16 +51,22 @@
     <disable_collisions link1="alfa_tube2h" link2="left_camera" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="left_coil" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="left_lense" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="middle_coil" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="right_camera" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="right_coil" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="right_lense" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="alfa_tube2h" link2="upper_arm" reason="Never" />
     <disable_collisions link1="alfa_tube2h" link2="wifi_antenna" reason="Adjacent" />
     <disable_collisions link1="arm_axel" link2="back_husky_bridge" reason="Never" />
     <disable_collisions link1="arm_axel" link2="back_left_wheel" reason="Never" />
@@ -65,6 +77,7 @@
     <disable_collisions link1="arm_axel" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="arm_axel" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="arm_axel" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="arm_axel" link2="base_imu" reason="Never" />
     <disable_collisions link1="arm_axel" link2="base_link" reason="Default" />
     <disable_collisions link1="arm_axel" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="arm_axel" link2="front_left_wheel" reason="Never" />
@@ -73,16 +86,19 @@
     <disable_collisions link1="arm_axel" link2="left_camera" reason="Never" />
     <disable_collisions link1="arm_axel" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="arm_axel" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="arm_axel" link2="left_coil" reason="Never" />
     <disable_collisions link1="arm_axel" link2="left_lense" reason="Never" />
     <disable_collisions link1="arm_axel" link2="lower_arm" reason="Adjacent" />
     <disable_collisions link1="arm_axel" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="arm_axel" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="arm_axel" link2="middle_coil" reason="Never" />
     <disable_collisions link1="arm_axel" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="arm_axel" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="arm_axel" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="arm_axel" link2="right_camera" reason="Never" />
     <disable_collisions link1="arm_axel" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="arm_axel" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="arm_axel" link2="right_coil" reason="Never" />
     <disable_collisions link1="arm_axel" link2="right_lense" reason="Never" />
     <disable_collisions link1="arm_axel" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="arm_axel" link2="upper_arm" reason="Adjacent" />
@@ -95,6 +111,7 @@
     <disable_collisions link1="back_husky_bridge" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="base_imu" reason="Adjacent" />
     <disable_collisions link1="back_husky_bridge" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="back_husky_bridge" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="front_left_wheel" reason="Never" />
@@ -103,16 +120,22 @@
     <disable_collisions link1="back_husky_bridge" link2="left_camera" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="left_coil" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="left_lense" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="middle_coil" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="right_camera" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="right_coil" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="right_lense" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="back_husky_bridge" link2="upper_arm" reason="Never" />
     <disable_collisions link1="back_husky_bridge" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="back_right_wheel" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="base_arm_link" reason="Never" />
@@ -121,6 +144,7 @@
     <disable_collisions link1="back_left_wheel" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="base_imu" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="back_left_wheel" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="front_left_wheel" reason="Never" />
@@ -129,15 +153,22 @@
     <disable_collisions link1="back_left_wheel" link2="left_camera" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="left_coil" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="left_lense" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="metal_detector_antenna" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="middle_coil" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="right_camera" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="right_coil" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="right_lense" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="back_left_wheel" link2="upper_arm" reason="Never" />
     <disable_collisions link1="back_left_wheel" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="base_arm_link" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="base_footprint" reason="Never" />
@@ -145,6 +176,7 @@
     <disable_collisions link1="back_right_wheel" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="base_imu" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="back_right_wheel" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="front_left_wheel" reason="Never" />
@@ -153,21 +185,29 @@
     <disable_collisions link1="back_right_wheel" link2="left_camera" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="left_coil" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="left_lense" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="metal_detector_antenna" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="middle_coil" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="right_camera" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="right_coil" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="right_lense" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="back_right_wheel" link2="upper_arm" reason="Never" />
     <disable_collisions link1="back_right_wheel" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_footprint" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_footprint_front_bumper_part" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="base_arm_link" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="base_arm_link" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="front_left_wheel" reason="Never" />
@@ -176,22 +216,27 @@
     <disable_collisions link1="base_arm_link" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_arm_link" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="left_lense" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_arm_link" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_arm_link" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_arm_link" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_arm_link" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="base_footprint" link2="base_footprint_front_bumper_part" reason="Adjacent" />
     <disable_collisions link1="base_footprint" link2="base_footprint_rear_bumper_part" reason="Adjacent" />
     <disable_collisions link1="base_footprint" link2="base_footprint_top_plate_part" reason="Adjacent" />
     <disable_collisions link1="base_footprint" link2="base_footprint_user_rail_part" reason="Adjacent" />
+    <disable_collisions link1="base_footprint" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_footprint" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="base_footprint" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_footprint" link2="front_left_wheel" reason="Never" />
@@ -200,16 +245,19 @@
     <disable_collisions link1="base_footprint" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_footprint" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_footprint" link2="left_lense" reason="Never" />
     <disable_collisions link1="base_footprint" link2="lower_arm" reason="Never" />
     <disable_collisions link1="base_footprint" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_footprint" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_footprint" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_footprint" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_footprint" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_footprint" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_footprint" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_footprint" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_footprint" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_footprint" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="base_footprint" link2="upper_arm" reason="Never" />
@@ -217,6 +265,7 @@
     <disable_collisions link1="base_footprint_front_bumper_part" link2="base_footprint_rear_bumper_part" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="base_link" reason="Default" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="front_left_wheel" reason="Never" />
@@ -225,20 +274,26 @@
     <disable_collisions link1="base_footprint_front_bumper_part" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="left_lense" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="lower_arm" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_footprint_front_bumper_part" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_footprint_front_bumper_part" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="base_footprint_top_plate_part" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="base_link" reason="Default" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="front_left_wheel" reason="Never" />
@@ -247,19 +302,25 @@
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="left_lense" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_footprint_rear_bumper_part" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_footprint_rear_bumper_part" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="base_footprint_user_rail_part" reason="Never" />
+    <disable_collisions link1="base_footprint_top_plate_part" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="base_link" reason="Default" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="front_left_wheel" reason="Never" />
@@ -268,20 +329,24 @@
     <disable_collisions link1="base_footprint_top_plate_part" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_top_plate_part" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="left_lense" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="lower_arm" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_footprint_top_plate_part" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_top_plate_part" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_footprint_top_plate_part" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="base_imu" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="base_link" reason="Default" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="front_husky_bridge" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="front_left_wheel" reason="Never" />
@@ -290,18 +355,48 @@
     <disable_collisions link1="base_footprint_user_rail_part" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="left_lense" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="lower_arm" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_footprint_user_rail_part" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_footprint_user_rail_part" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="base_imu" link2="base_link" reason="Never" />
+    <disable_collisions link1="base_imu" link2="front_husky_bridge" reason="Never" />
+    <disable_collisions link1="base_imu" link2="front_left_wheel" reason="Never" />
+    <disable_collisions link1="base_imu" link2="front_right_wheel" reason="Never" />
+    <disable_collisions link1="base_imu" link2="gps_antenna" reason="Never" />
+    <disable_collisions link1="base_imu" link2="left_camera" reason="Never" />
+    <disable_collisions link1="base_imu" link2="left_camera_base" reason="Never" />
+    <disable_collisions link1="base_imu" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_imu" link2="left_coil" reason="Never" />
+    <disable_collisions link1="base_imu" link2="left_lense" reason="Never" />
+    <disable_collisions link1="base_imu" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="base_imu" link2="metal_detector_antenna" reason="Never" />
+    <disable_collisions link1="base_imu" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_imu" link2="middle_coil" reason="Never" />
+    <disable_collisions link1="base_imu" link2="ptu_d46_base_link" reason="Never" />
+    <disable_collisions link1="base_imu" link2="ptu_d46_pan_link" reason="Never" />
+    <disable_collisions link1="base_imu" link2="ptu_d46_tilt_link" reason="Never" />
+    <disable_collisions link1="base_imu" link2="right_camera" reason="Never" />
+    <disable_collisions link1="base_imu" link2="right_camera_base" reason="Never" />
+    <disable_collisions link1="base_imu" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_imu" link2="right_coil" reason="Never" />
+    <disable_collisions link1="base_imu" link2="right_lense" reason="Never" />
+    <disable_collisions link1="base_imu" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_imu" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="base_imu" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="base_link" link2="front_husky_bridge" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="front_left_wheel" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="front_right_wheel" reason="Adjacent" />
@@ -309,15 +404,21 @@
     <disable_collisions link1="base_link" link2="left_camera" reason="Never" />
     <disable_collisions link1="base_link" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="base_link" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_link" link2="left_coil" reason="Never" />
     <disable_collisions link1="base_link" link2="left_lense" reason="Never" />
+    <disable_collisions link1="base_link" link2="metal_detector_antenna" reason="Never" />
+    <disable_collisions link1="base_link" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="base_link" link2="middle_coil" reason="Never" />
     <disable_collisions link1="base_link" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="base_link" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="base_link" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="base_link" link2="right_camera" reason="Never" />
     <disable_collisions link1="base_link" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="base_link" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="base_link" link2="right_coil" reason="Never" />
     <disable_collisions link1="base_link" link2="right_lense" reason="Never" />
     <disable_collisions link1="base_link" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="base_link" link2="upper_arm" reason="Never" />
     <disable_collisions link1="base_link" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="front_left_wheel" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="front_right_wheel" reason="Never" />
@@ -325,15 +426,18 @@
     <disable_collisions link1="front_husky_bridge" link2="left_camera" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="left_camera_base" reason="Adjacent" />
     <disable_collisions link1="front_husky_bridge" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_husky_bridge" link2="left_coil" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="left_lense" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="front_husky_bridge" link2="middle_coil" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="ptu_d46_base_link" reason="Adjacent" />
     <disable_collisions link1="front_husky_bridge" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="right_camera" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="right_camera_base" reason="Adjacent" />
     <disable_collisions link1="front_husky_bridge" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_husky_bridge" link2="right_coil" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="right_lense" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="front_husky_bridge" link2="wifi_antenna" reason="Never" />
@@ -342,126 +446,205 @@
     <disable_collisions link1="front_left_wheel" link2="left_camera" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_left_wheel" link2="left_coil" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="left_lense" reason="Never" />
+    <disable_collisions link1="front_left_wheel" link2="lower_arm" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="front_left_wheel" link2="middle_coil" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="right_camera" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_left_wheel" link2="right_coil" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="right_lense" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="front_left_wheel" link2="upper_arm" reason="Never" />
     <disable_collisions link1="front_left_wheel" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="gps_antenna" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="left_camera" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_right_wheel" link2="left_coil" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="left_lense" reason="Never" />
+    <disable_collisions link1="front_right_wheel" link2="lower_arm" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="front_right_wheel" link2="middle_coil" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="right_camera" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="front_right_wheel" link2="right_coil" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="right_lense" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="front_right_wheel" link2="upper_arm" reason="Never" />
     <disable_collisions link1="front_right_wheel" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="left_camera" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="left_camera_standoff" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="left_coil" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="left_lense" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="middle_coil" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="right_camera" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="right_coil" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="right_lense" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="gps_antenna" link2="upper_arm" reason="Never" />
     <disable_collisions link1="gps_antenna" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="left_camera" link2="left_camera_base" reason="Never" />
     <disable_collisions link1="left_camera" link2="left_camera_standoff" reason="Adjacent" />
+    <disable_collisions link1="left_camera" link2="left_coil" reason="Never" />
     <disable_collisions link1="left_camera" link2="left_lense" reason="Adjacent" />
+    <disable_collisions link1="left_camera" link2="lower_arm" reason="Never" />
     <disable_collisions link1="left_camera" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="left_camera" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="left_camera" link2="middle_coil" reason="Never" />
     <disable_collisions link1="left_camera" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="left_camera" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="left_camera" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="left_camera" link2="right_camera" reason="Never" />
     <disable_collisions link1="left_camera" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="left_camera" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="left_camera" link2="right_coil" reason="Never" />
     <disable_collisions link1="left_camera" link2="right_lense" reason="Never" />
     <disable_collisions link1="left_camera" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="left_camera" link2="upper_arm" reason="Never" />
     <disable_collisions link1="left_camera" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="left_camera_standoff" reason="Adjacent" />
+    <disable_collisions link1="left_camera_base" link2="left_coil" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="left_lense" reason="Never" />
+    <disable_collisions link1="left_camera_base" link2="lower_arm" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="left_camera_base" link2="middle_coil" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="right_camera" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="left_camera_base" link2="right_coil" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="right_lense" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="left_camera_base" link2="upper_arm" reason="Never" />
     <disable_collisions link1="left_camera_base" link2="wifi_antenna" reason="Never" />
-    <disable_collisions link1="left_camera_standoff" link2="left_lense" reason="Default" />
+    <disable_collisions link1="left_camera_standoff" link2="left_coil" reason="Never" />
+    <disable_collisions link1="left_camera_standoff" link2="left_lense" reason="Never" />
+    <disable_collisions link1="left_camera_standoff" link2="lower_arm" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="left_camera_standoff" link2="middle_coil" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="right_camera" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="left_camera_standoff" link2="right_coil" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="right_lense" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="left_camera_standoff" link2="upper_arm" reason="Never" />
     <disable_collisions link1="left_camera_standoff" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="left_coil" link2="left_lense" reason="Never" />
+    <disable_collisions link1="left_coil" link2="lower_arm" reason="Never" />
+    <disable_collisions link1="left_coil" link2="metal_detector_antenna" reason="Adjacent" />
+    <disable_collisions link1="left_coil" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="left_coil" link2="middle_coil" reason="Never" />
+    <disable_collisions link1="left_coil" link2="ptu_d46_base_link" reason="Never" />
+    <disable_collisions link1="left_coil" link2="ptu_d46_pan_link" reason="Never" />
+    <disable_collisions link1="left_coil" link2="ptu_d46_tilt_link" reason="Never" />
+    <disable_collisions link1="left_coil" link2="right_camera" reason="Never" />
+    <disable_collisions link1="left_coil" link2="right_camera_base" reason="Never" />
+    <disable_collisions link1="left_coil" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="left_coil" link2="right_coil" reason="Never" />
+    <disable_collisions link1="left_coil" link2="right_lense" reason="Never" />
+    <disable_collisions link1="left_coil" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="left_coil" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="left_coil" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="left_lense" link2="lower_arm" reason="Never" />
     <disable_collisions link1="left_lense" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="left_lense" link2="metal_detector_arm" reason="Never" />
+    <disable_collisions link1="left_lense" link2="middle_coil" reason="Never" />
     <disable_collisions link1="left_lense" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="left_lense" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="left_lense" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="left_lense" link2="right_camera" reason="Never" />
     <disable_collisions link1="left_lense" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="left_lense" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="left_lense" link2="right_coil" reason="Never" />
     <disable_collisions link1="left_lense" link2="right_lense" reason="Never" />
     <disable_collisions link1="left_lense" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="left_lense" link2="upper_arm" reason="Never" />
     <disable_collisions link1="left_lense" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="metal_detector_antenna" reason="Never" />
     <disable_collisions link1="lower_arm" link2="metal_detector_arm" reason="Default" />
+    <disable_collisions link1="lower_arm" link2="middle_coil" reason="Never" />
     <disable_collisions link1="lower_arm" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="lower_arm" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="lower_arm" link2="ptu_d46_tilt_link" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="right_camera" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="right_camera_base" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="right_coil" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="right_lense" reason="Never" />
     <disable_collisions link1="lower_arm" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="lower_arm" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="metal_detector_arm" reason="Adjacent" />
+    <disable_collisions link1="metal_detector_antenna" link2="middle_coil" reason="Adjacent" />
     <disable_collisions link1="metal_detector_antenna" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="right_camera" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="metal_detector_antenna" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="metal_detector_antenna" link2="right_coil" reason="Adjacent" />
     <disable_collisions link1="metal_detector_antenna" link2="right_lense" reason="Never" />
+    <disable_collisions link1="metal_detector_antenna" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="metal_detector_antenna" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="metal_detector_antenna" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="metal_detector_arm" link2="middle_coil" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="ptu_d46_base_link" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="ptu_d46_pan_link" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="right_camera" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="metal_detector_arm" link2="right_coil" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="right_lense" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="metal_detector_arm" link2="upper_arm" reason="Adjacent" />
     <disable_collisions link1="metal_detector_arm" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="ptu_d46_base_link" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="ptu_d46_pan_link" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="ptu_d46_tilt_link" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="right_camera" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="right_camera_base" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="right_coil" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="right_lense" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="middle_coil" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="ptu_d46_pan_link" reason="Adjacent" />
     <disable_collisions link1="ptu_d46_base_link" link2="ptu_d46_tilt_link" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="right_camera" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="ptu_d46_base_link" link2="right_coil" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="right_lense" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="ptu_d46_base_link" link2="upper_arm" reason="Never" />
@@ -470,6 +653,7 @@
     <disable_collisions link1="ptu_d46_pan_link" link2="right_camera" reason="Never" />
     <disable_collisions link1="ptu_d46_pan_link" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="ptu_d46_pan_link" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="ptu_d46_pan_link" link2="right_coil" reason="Never" />
     <disable_collisions link1="ptu_d46_pan_link" link2="right_lense" reason="Never" />
     <disable_collisions link1="ptu_d46_pan_link" link2="sick_lms100" reason="Never" />
     <disable_collisions link1="ptu_d46_pan_link" link2="upper_arm" reason="Never" />
@@ -477,23 +661,37 @@
     <disable_collisions link1="ptu_d46_tilt_link" link2="right_camera" reason="Never" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="right_camera_standoff" reason="Never" />
+    <disable_collisions link1="ptu_d46_tilt_link" link2="right_coil" reason="Never" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="right_lense" reason="Never" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="sick_lms100" reason="Adjacent" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="upper_arm" reason="Never" />
     <disable_collisions link1="ptu_d46_tilt_link" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="right_camera" link2="right_camera_base" reason="Never" />
     <disable_collisions link1="right_camera" link2="right_camera_standoff" reason="Adjacent" />
+    <disable_collisions link1="right_camera" link2="right_coil" reason="Never" />
     <disable_collisions link1="right_camera" link2="right_lense" reason="Adjacent" />
     <disable_collisions link1="right_camera" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="right_camera" link2="upper_arm" reason="Never" />
     <disable_collisions link1="right_camera" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="right_camera_base" link2="right_camera_standoff" reason="Adjacent" />
+    <disable_collisions link1="right_camera_base" link2="right_coil" reason="Never" />
     <disable_collisions link1="right_camera_base" link2="right_lense" reason="Never" />
     <disable_collisions link1="right_camera_base" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="right_camera_base" link2="upper_arm" reason="Never" />
     <disable_collisions link1="right_camera_base" link2="wifi_antenna" reason="Never" />
-    <disable_collisions link1="right_camera_standoff" link2="right_lense" reason="Default" />
+    <disable_collisions link1="right_camera_standoff" link2="right_coil" reason="Never" />
+    <disable_collisions link1="right_camera_standoff" link2="right_lense" reason="Never" />
     <disable_collisions link1="right_camera_standoff" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="right_camera_standoff" link2="upper_arm" reason="Never" />
     <disable_collisions link1="right_camera_standoff" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="right_coil" link2="right_lense" reason="Never" />
+    <disable_collisions link1="right_coil" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="right_coil" link2="upper_arm" reason="Never" />
+    <disable_collisions link1="right_coil" link2="wifi_antenna" reason="Never" />
     <disable_collisions link1="right_lense" link2="sick_lms100" reason="Never" />
+    <disable_collisions link1="right_lense" link2="upper_arm" reason="Never" />
     <disable_collisions link1="right_lense" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="sick_lms100" link2="upper_arm" reason="Never" />
     <disable_collisions link1="sick_lms100" link2="wifi_antenna" reason="Never" />
+    <disable_collisions link1="upper_arm" link2="wifi_antenna" reason="Never" />
 </robot>

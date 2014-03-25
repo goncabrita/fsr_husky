@@ -1,0 +1,10 @@
+controller_list:
+ - name: arm_controller
+   action_ns: follow_joint_trajectory
+   type: FollowJointTrajectory
+   default: true
+   joints:
+     - upper_arm_joint
+     - lower_arm_joint
+     - metal_detector_arm_joint
+     - arm_axel_joint

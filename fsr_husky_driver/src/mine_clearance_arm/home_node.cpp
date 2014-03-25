@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "home_node");
     ros::NodeHandle n;
 
-    actionlib::SimpleActionClient<fsr_husky_driver::HomeAction> ac("fsr_husky_arm/home", true);
+    actionlib::SimpleActionClient<fsr_husky_driver::HomeAction> ac("/arm/home", true);
     ROS_INFO("FSR Husky Arm Homing -- Waiting for the action server to start...");
     ac.waitForServer();
     ROS_INFO("FSR Husky Arm Homing -- Got it!");

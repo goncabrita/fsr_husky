@@ -1,16 +1,17 @@
 joint_limits:
   metal_detector_arm_joint:
-    has_velocity_limits: false
-    max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
-  upper_arm_joint:
-    has_velocity_limits: false
-    max_velocity: 0
+    has_velocity_limits: true
+    max_velocity: 1.5
     has_acceleration_limits: false
     max_acceleration: 0
   arm_axel_joint:
-    has_velocity_limits: false
-    max_velocity: 0
+    has_velocity_limits: true
+    max_velocity: 1.5
+    min_velocity: 0.8
+    has_acceleration_limits: false
+    max_acceleration: 0
+  upper_arm_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
     has_acceleration_limits: false
     max_acceleration: 0

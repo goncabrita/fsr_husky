@@ -4,7 +4,7 @@ project(fsr_husky_driver)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs control_msgs)
+find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs control_msgs moveit_core moveit_ros_planning_interface moveit_ros_perception hardware_interface controller_manager)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -80,7 +80,8 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(pointcloud_generator src/pointcloud_generator/pointcloud_generator.cpp)
+add_executable(laser_assembler_node src/pointcloud_generator/laser_assembler.cpp)
+add_executable(cloud_assembler_node src/pointcloud_generator/cloud_assembler.cpp)
 add_executable(fsr_husky_arm_node src/mine_clearance_arm/fsr_husky_arm_node.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
 add_executable(home_node src/mine_clearance_arm/home_node.cpp)
 add_executable(sweep_node src/mine_clearance_arm/sweep_node.cpp)
@@ -89,12 +90,14 @@ add_executable(sweep_node src/mine_clearance_arm/sweep_node.cpp)
 ## as an example, message headers may need to be generated before nodes
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(pointcloud_generator ${catkin_LIBRARIES})
+target_link_libraries(laser_assembler_node ${catkin_LIBRARIES})
+target_link_libraries(cloud_assembler_node ${catkin_LIBRARIES})
 target_link_libraries(fsr_husky_arm_node ${catkin_LIBRARIES} cereal_port)
 target_link_libraries(home_node ${catkin_LIBRARIES})
 target_link_libraries(sweep_node ${catkin_LIBRARIES})
 
-add_dependencies(pointcloud_generator ${catkin_EXPORTED_TARGETS})
+add_dependencies(laser_assembler_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(cloud_assembler_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(fsr_husky_arm_node ${catkin_EXPORTED_TARGETS})
 
 #############

@@ -1,0 +1,11 @@
+sensors: 
+ - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
+   point_cloud_topic: tilt_scan_cloud
+   filtered_cloud_topic: tilt_scan_cloud_filtered
+   max_range: 10.0
+   point_subsample: 1 
+   padding_offset: 0.1
+   padding_scale: 1.0
+   shape_padding: 0.1
+   shape_scale: 1.0
+   
