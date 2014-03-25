@@ -68,6 +68,11 @@
 	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky.urdf.xacro'" />
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 	<node name="joint_state_publisher" pkg="fsr_husky_description" type="joint_state_publisher" />
+	
+	<!-- Load the controllers -->
+	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
+    
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_controller"/>
 
 	<!--Sound Play -->
 	<node name="sound_play" pkg="sound_play" type="soundplay_node.py" />
