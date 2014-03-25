@@ -84,7 +84,7 @@
 	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
 	<rosparam file="$(find fsr_husky_bringup)/controllers/arm_controllers.yaml" command="load"/>
     
-	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_controller"/>
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller ptu_d46_controller arm_controller"/>
 
 	<!--Sound Play -->
 	<node name="sound_play" pkg="sound_play" type="soundplay_node.py" />
