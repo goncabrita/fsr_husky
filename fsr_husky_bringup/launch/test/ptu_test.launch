@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- PTU-D46 Pan and Tilt -->
+	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" output="screen" >
+		<param name="port" value="/dev/ttyUSB0" />
+	</node>
+
+	<!-- FSR Husky URDF -->
+	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky_mine_detection.urdf.xacro'" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+	<node name="joint_state_publisher" pkg="fsr_husky_description" type="joint_state_publisher" />
+	
+	<!-- Load the controllers -->
+	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
+	<rosparam file="$(find fsr_husky_bringup)/controllers/ptu_d46_controller.yaml" command="load"/>
+    
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller ptu_d46_controller"/>
+
+</launch>

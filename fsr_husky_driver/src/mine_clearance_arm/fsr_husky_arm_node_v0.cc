@@ -1,17 +1,22 @@
 
 
 #include <ros/ros.h>
-#include <hardware_interface/joint_command_interface.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/robot_hw.h>
+#include <sensor_msgs/JointState.h>
 
 #include "jrk_driver.h"
 #include "nanotec_driver.h"
 
-class FSRHuskyArm : public hardware_interface::RobotHW
+#include <actionlib/server/simple_action_server.h>
+#include <fsr_husky_driver/HomeAction.h>
+#include <fsr_husky_driver/GotoAction.h>
+//#include <control_msgs/FollowJointTrajectoryAction.h>
+
+class FSRHuskyArm
 {
     public:
-        FSRHuskyArm();
+        FSRHuskyArm(ros::NodeHandle& node_handle, ros::NodeHandle& private_node_handle);
+        ~FSRHuskyArm();
+
         void init();
         bool home(double timeout=120.0);
         void setGoal(const sensor_msgs::JointState::ConstPtr& msg);
@@ -20,20 +25,13 @@ class FSRHuskyArm : public hardware_interface::RobotHW
         actionlib::SimpleActionServer<fsr_husky_driver::HomeAction> m_as_home_;
         void asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req);
 
-        //actionlib::SimpleActionServer<fsr_husky_driver::GotoAction> m_as_goto_;
-        //void asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal);
+        actionlib::SimpleActionServer<fsr_husky_driver::GotoAction> m_as_goto_;
+        void asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal);
 
-        actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> m_as_goto_;
-        void asGotoCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal);
+        //actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> m_as_goto_;
+        //void asGotoCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal);
 
     private:
-        hardware_interface::JointStateInterface jnt_state_interface;
-        hardware_interface::PositionJointInterface jnt_pos_interface;
-        double cmd[2];
-        double pos[2];
-        double vel[2];
-        double eff[2];
-
         JRK jrk;
         Nanotec nanotec;
 
@@ -74,8 +72,7 @@ class FSRHuskyArm : public hardware_interface::RobotHW
 
 FSRHuskyArm::FSRHuskyArm(ros::NodeHandle& node_handle, ros::NodeHandle& private_node_handle) : jrk(), m_node(node_handle), m_private_node(private_node_handle),
     m_as_home_(node_handle, "fsr_husky_arm/home", boost::bind(&FSRHuskyArm::asHomeCallback, this, _1), false),
-    //m_as_goto_(node_handle, "fsr_husky_arm/goto", boost::bind(&FSRHuskyArm::asGotoCallback, this, _1), false)
-    m_as_goto_(node_handle, "/arm_controller/follow_joint_trajectory", boost::bind(&FSRHuskyArm::asGotoCallback, this, _1), false)
+    m_as_goto_(node_handle, "fsr_husky_arm/goto", boost::bind(&FSRHuskyArm::asGotoCallback, this, _1), false)
 {
     m_private_node.param<std::string>("base_frame_id", base_frame_id_, "arm_base_link");
     m_private_node.param<std::string>("linear_frame_id", linear_frame_id_, "arm_linear_link");
@@ -334,84 +331,7 @@ void FSRHuskyArm::asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req)
     }
 }
 
-/*void FSRHuskyArm::asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal)
-{
-    ros::Rate loop_rate(10.0);
-
-    ros::Time start_time = ros::Time::now();
-
-    double speed_l = goal->joint.velocity[0];
-    double l = goal->joint.position[0];
-    if(l < min_linear_position_) l = min_linear_position_;
-    if(l > max_linear_position_) l = max_linear_position_;
-    int goal_l = (l - min_linear_position_)*4048/(max_linear_position_ - min_linear_position_);
-
-    double speed_a = goal->joint.velocity[1];
-    double a = goal->joint.position[1];
-    if(a < min_angular_position_) a = min_angular_position_;
-    if(a > max_angular_position_) a = max_angular_position_;
-    int goal_a = (a - min_angular_position_)*max_position_/(max_angular_position_ - min_angular_position_);
-
-    jrk.setPosition(goal_l);
-    nanotec.setPosition(goal_a);
-
-    // start executing the action
-    while(ros::ok())
-    {
-        // check that preempt has not been requested by the client
-        if(m_as_goto_.isPreemptRequested())
-        {
-            ROS_INFO("FSR Husky Arm - %s - Goal preempted", __FUNCTION__);
-            // set the action state to preempted
-            m_as_goto_.setPreempted();
-            break;
-        }
-
-        // Read Position & Speed
-        sensor_msgs::JointState joint_state;
-        joint_state.header.stamp = ros::Time::now();
-        joint_state.header.frame_id = "fsr_husky_arm";
-        joint_state.name.resize(2);
-        joint_state.position.resize(2);
-        joint_state.velocity.resize(2);
-        joint_state.name[0] = linear_joint_;
-        joint_state.position[0] = linear_position_;
-        joint_state.velocity[0] = linear_speed_;
-        joint_state.name[1] = rotation_joint_;
-        joint_state.position[1] = angular_position_;
-        joint_state.velocity[1] = angular_speed_;
-
-        if(ros::Time::now() - start_time > timeout_)
-        {
-            fsr_husky_driver::GotoResult result;
-            result.joint = joint_state;
-            ROS_INFO("FSR Husky Arm - %s - Goal timeout", __FUNCTION__);
-            // set the action state to failed
-            m_as_goto_.setAborted();
-            break;
-        }
-
-        //ROS_INFO("[DEBUG] goal:%lf position:%lf tolerance:%lf", goal->joint.position[1], angular_position_, goal_tolerance_);
-        //ROS_INFO("[DEBUG] goal:%lf position:%lf tolerance:%lf", goal->joint.position[0], linear_position_, goal_tolerance_);
-        if( fabs(goal->joint.position[0] - linear_position_) <= goal_tolerance_*4.0  && fabs(goal->joint.position[1] - angular_position_) <= goal_tolerance_ )
-        {
-            fsr_husky_driver::GotoResult result;
-            result.joint = joint_state;
-            // set the action state to succeeded
-            m_as_goto_.setSucceeded(result);
-            break;
-        }
-
-        fsr_husky_driver::GotoFeedback feedback;
-        feedback.joint = joint_state;
-        // publish the feedback
-        m_as_goto_.publishFeedback(feedback);
-
-        loop_rate.sleep();
-    }
-}*/
-
-void FSRHuskyArm::asGotoCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
+void FSRHuskyArm::asGotoCallback(const fsr_husky_driver::GotoGoalConstPtr &goal)
 {
     ros::Rate loop_rate(10.0);
 
@@ -487,7 +407,6 @@ void FSRHuskyArm::asGotoCallback(const control_msgs::FollowJointTrajectoryGoalCo
         loop_rate.sleep();
     }
 }
-
 
 int main(int argc, char** argv)
 {

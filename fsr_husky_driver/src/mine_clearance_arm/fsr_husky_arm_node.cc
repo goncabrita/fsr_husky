@@ -1,90 +1,90 @@
 
 #include <ros/ros.h>
-#include <hardware_interface/joint_command_interface.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/robot_hw.h>
 #include <actionlib/server/simple_action_server.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <sensor_msgs/JointState.h>
 #include <fsr_husky_driver/HomeAction.h>
-#include <controller_manager/controller_manager.h>
 
 #include "jrk_driver.h"
 #include "nanotec_driver.h"
 
-class FSRHuskyArm : public hardware_interface::RobotHW
+class FSRHuskyArm
 {
     public:
         FSRHuskyArm(ros::NodeHandle &nh);
 
         void init(ros::NodeHandle &pnh);
-        bool home(double timeout=120.0);
-        void write();
-        void read();
-
-        actionlib::SimpleActionServer<fsr_husky_driver::HomeAction> m_as_home_;
-        void asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req);
+        void spinOnce();
 
     private:
-        hardware_interface::JointStateInterface jnt_state_interface;
-        hardware_interface::PositionJointInterface jnt_pos_interface;
-        hardware_interface::VelocityJointInterface jnt_vel_interface;
-        double cmd_pos[2];
-        double cmd_vel[2];
-        double pos[2];
-        double vel[2];
-        double eff[2];
+        ros::Publisher  m_joint_pub_;
+        ros::Subscriber m_joint_sub_;
+
+        void setGoal(const trajectory_msgs::JointTrajectory::ConstPtr& msg);
+
+        actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> m_as_goal_;
+        bool as_active_;
+        void actionServerCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal);
+
+        bool home(double timeout=120.0);
+        actionlib::SimpleActionServer<fsr_husky_driver::HomeAction> m_as_home_;
+        void asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req);
+        bool homing_complete_;
+
+        bool checkJointNames(const std::vector<std::string> *joint_names);
+        bool checkGoal(const std::vector<trajectory_msgs::JointTrajectoryPoint> *points);
+
+        void write(double lift, double lift_speed, double sweep, double sweep_speed);
+
+        std::string lift_joint_;
+        std::string sweep_joint_;
+
+        ros::Time start_time_;
+        ros::Time goal_start_time_;
+        std::list<trajectory_msgs::JointTrajectoryPoint> trajectory_;
+        std::vector<control_msgs::JointTolerance> path_tolerance_;
+        std::vector<control_msgs::JointTolerance> goal_tolerance_;
+        ros::Duration goal_time_tolerance_;
 
         JRK jrk;
         Nanotec nanotec;
 
         ros::Time last_update_;
-        double last_linear_position_;
-        double last_rotation_position_;
+        double last_lift_;
+        double last_sweep_;
 
-        int max_position_;
+        double lift_;
+        double sweep_;
+        double lift_speed_;
+        double sweep_speed_;
+        double min_lift_;
+        double max_lift_;
+        double max_lift_speed_;
+        double min_sweep_;
+        double max_sweep_;
+        double max_sweep_speed_;
+        double lift_tolerance_;
+        double sweep_tolerance_;
+        ros::Duration time_tolerance_;
 
-        double min_linear_position_;
-        double max_linear_position_;
-        double min_angular_position_;
-        double max_angular_position_;
+        int lift_index_;
+        int sweep_index_;
 
-        double linear_position_;
-        double angular_position_;
-        double linear_speed_;
-        double angular_speed_;
-
-        bool homing_complete_;
+        int max_sweep_steps_;
 };
 
-FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) : m_as_home_(nh, "/arm/home", boost::bind(&FSRHuskyArm::asHomeCallback, this, _1), false)
+FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
+    m_as_home_(nh, "/arm/home", boost::bind(&FSRHuskyArm::asHomeCallback, this, _1), false),
+    m_as_goal_(nh, "/arm_controller/follow_joint_trajectory", boost::bind(&FSRHuskyArm::actionServerCallback, this, _1), false)
+
 {
+    // Publishers : Only publish the most recent reading
+    m_joint_pub_ = nh.advertise<sensor_msgs::JointState>("/arm_controller/state", 1);
+
+    // Subscribers : Only subscribe to the most recent instructions
+    m_joint_sub_ = nh.subscribe("/arm_controller/command", 1, &FSRHuskyArm::setGoal, this);
+
     homing_complete_ = false;
-
-    // connect and register the joint state interface
-    hardware_interface::JointStateHandle state_handle_a("arm_axel_joint", &pos[1], &vel[1], &eff[1]);
-    jnt_state_interface.registerHandle(state_handle_a);
-
-    hardware_interface::JointStateHandle state_handle_l("upper_arm_joint", &pos[0], &vel[0], &eff[0]);
-    jnt_state_interface.registerHandle(state_handle_l);
-
-    registerInterface(&jnt_state_interface);
-
-    // connect and register the joint position interface
-    hardware_interface::JointHandle pos_handle_a(jnt_state_interface.getHandle("arm_axel_joint"), &cmd_pos[1]);
-    jnt_pos_interface.registerHandle(pos_handle_a);
-
-    hardware_interface::JointHandle pos_handle_l(jnt_state_interface.getHandle("upper_arm_joint"), &cmd_pos[0]);
-    jnt_pos_interface.registerHandle(pos_handle_l);
-
-    registerInterface(&jnt_pos_interface);
-
-    // connect and register the joint velocity interface
-    /*hardware_interface::JointHandle vel_handle_pan(jnt_state_interface.getHandle("arm_axel_joint"), &cmd_vel[0]);
-    jnt_vel_interface.registerHandle(vel_handle_pan);
-
-    hardware_interface::JointHandle vel_handle_tilt(jnt_state_interface.getHandle("upper_arm_joint"), &cmd_vel[1]);
-    jnt_vel_interface.registerHandle(vel_handle_tilt);
-
-    registerInterface(&jnt_vel_interface);*/
 }
 
 void FSRHuskyArm::init(ros::NodeHandle &pnh)
@@ -95,16 +95,10 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     int linear_baudrate;
     pnh.param("linear_actuator_baudrate", linear_baudrate, 115200);
 
-    pnh.param("min_linear_position", min_linear_position_, -0.5236);
-    pnh.param("max_linear_position", max_linear_position_, 0.5236);
-
     std::string rotation_port;
     pnh.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02");
     int rotation_baudrate;
     pnh.param("rotation_actuator_baudrate", rotation_baudrate, 115200);
-
-    pnh.param("min_angular_position", min_angular_position_, -0.8);
-    pnh.param("max_angular_position", max_angular_position_, 0.8);
 
     if(!jrk.init(&linear_port, linear_baudrate))
     {
@@ -116,6 +110,24 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
         ROS_FATAL("FSR Husky Arm - %s - Failed to initialize the rotation actuator!", __FUNCTION__);
         ROS_BREAK();
     }
+
+    pnh.param<std::string>("lift_joint", lift_joint_, "upper_arm_joint");
+    pnh.param<std::string>("sweep_joint", sweep_joint_, "arm_axel_joint");
+
+    pnh.param("min_lift", min_lift_, -0.5);
+    pnh.param("max_lift", max_lift_, 0.5);
+    pnh.param("max_lift_speed", max_lift_speed_, 1.0);
+
+    pnh.param("min_sweep", min_sweep_, -0.8);
+    pnh.param("max_sweep", max_sweep_, 0.8);
+    pnh.param("max_sweep_speed", max_sweep_speed_, 1.0);
+
+    pnh.param("lift_tolerance", lift_tolerance_, 0.05);
+    pnh.param("sweep_tolerance", sweep_tolerance_, 0.05);
+
+    double time_tolerance;
+    pnh.param("time_tolerance", time_tolerance, 0.5);
+    time_tolerance_ = ros::Duration(time_tolerance);
 
     bool go_home;
     pnh.param("home", go_home, false);
@@ -129,6 +141,9 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     }
 
     m_as_home_.start();
+
+    m_as_goal_.start();
+    as_active_ = false;
 
     if(!nanotec.setSpeeds(200, 400))
     {
@@ -208,14 +223,14 @@ bool FSRHuskyArm::home(double timeout)
         return false;
     }
 
-    if(!nanotec.getPosition(max_position_))
+    if(!nanotec.getPosition(max_sweep_steps_))
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to get the position!", __FUNCTION__);
         return false;
     }
-    ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_position_);
+    ROS_INFO("FSR Husky Arm - %s - Limit reached at %d steps.", __FUNCTION__, max_sweep_steps_);
 
-    if(!nanotec.setPosition(max_position_/2))
+    if(!nanotec.setPosition(max_sweep_steps_/2))
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to complete the homing routine!", __FUNCTION__);
         return false;
@@ -227,25 +242,58 @@ bool FSRHuskyArm::home(double timeout)
     return true;
 }
 
-void FSRHuskyArm::write()
+void FSRHuskyArm::write(double lift, double lift_speed, double sweep, double sweep_speed)
 {
     if(!homing_complete_) return;
 
-    double l = cmd_pos[0];
-    if(l < min_linear_position_) l = min_linear_position_;
-    if(l > max_linear_position_) l = max_linear_position_;
-    int goal_l = (l - min_linear_position_)*4048/(max_linear_position_ - min_linear_position_);
+    double l = lift;
+    if(l < min_lift_) l = min_lift_;
+    if(l > max_lift_) l = max_lift_;
+    int goal_l = (l - min_lift_)*4048/(max_lift_ - min_lift_);
 
-    double a = cmd_pos[1];
-    if(a < min_angular_position_) a = min_angular_position_;
-    if(a > max_angular_position_) a = max_angular_position_;
-    int goal_a = (a - min_angular_position_)*max_position_/(max_angular_position_ - min_angular_position_);
+    double a = sweep;
+    if(a < min_sweep_) a = min_sweep_;
+    if(a > max_sweep_) a = max_sweep_;
+    int goal_a = (a - min_sweep_)*max_sweep_steps_/(max_sweep_ - min_sweep_);
 
     jrk.setPosition(goal_l);
     nanotec.setPosition(goal_a);
 }
 
-void FSRHuskyArm::read()
+bool FSRHuskyArm::checkJointNames(const std::vector<std::string> *joint_names)
+{
+    int found_joint = 0;
+    for(int i=0 ; i<joint_names->size() ; i++)
+    {
+        if(lift_joint_.compare(joint_names->at(i)) == 0)
+        {
+            lift_index_ = i;
+            found_joint++;
+        }
+        else if(sweep_joint_.compare(joint_names->at(i)) == 0)
+        {
+            sweep_index_ = i;
+            found_joint++;
+        }
+    }
+    return (joint_names->size() == found_joint);
+}
+
+bool FSRHuskyArm::checkGoal(const std::vector<trajectory_msgs::JointTrajectoryPoint> *points)
+{
+    for(int i=0 ; i<points->size() ; i++)
+    {
+        if(     points->at(i).positions[lift_index_] < min_lift_ ||
+                points->at(i).positions[lift_index_] > max_lift_ ||
+                points->at(i).positions[sweep_index_] < min_sweep_ ||
+                points->at(i).positions[sweep_index_] > max_sweep_ ||
+                points->at(i).velocities[lift_index_] > max_lift_speed_ ||
+                points->at(i).velocities[sweep_index_] > max_sweep_speed_) return false;
+    }
+    return true;
+}
+
+void FSRHuskyArm::spinOnce()
 {
     if(!homing_complete_) return;
 
@@ -257,8 +305,8 @@ void FSRHuskyArm::read()
     }
     //ROS_INFO("linear position:%d", linear_position);
     ros::Duration delta_t = ros::Time::now() - last_update_;
-    linear_position_ = linear_position*(max_linear_position_ - min_linear_position_)/4048 + min_linear_position_;
-    linear_speed_ = (linear_position_ - last_linear_position_)/delta_t.toSec();
+    lift_ = linear_position*(max_lift_ - min_lift_)/4048 + min_lift_;
+    lift_speed_ = (lift_ - last_lift_)/delta_t.toSec();
 
     int rotation_position;
     if(!nanotec.getPosition(rotation_position))
@@ -267,20 +315,206 @@ void FSRHuskyArm::read()
         return;
     }
     delta_t = ros::Time::now() - last_update_;
-    angular_position_ = rotation_position*(max_angular_position_ - min_angular_position_)/max_position_ + min_angular_position_;
-    angular_speed_ = (angular_position_ - last_rotation_position_)/delta_t.toSec();
+    sweep_ = rotation_position*(max_sweep_ - min_sweep_)/max_sweep_steps_ + min_sweep_;
+    sweep_speed_ = (sweep_ - last_sweep_)/delta_t.toSec();
 
-    pos[1] = angular_position_;
-    vel[1] = angular_speed_;
-    eff[1] = 0.0;
-
-    pos[0] = linear_position_;
-    vel[0] = linear_speed_;
-    eff[0] = 0.0;
+    // Publish Position & Speed
+    sensor_msgs::JointState joint_state;
+    joint_state.header.stamp = ros::Time::now();
+    joint_state.name.resize(2);
+    joint_state.position.resize(2);
+    joint_state.velocity.resize(2);
+    joint_state.name[0] = lift_joint_;
+    joint_state.position[0] = lift_;
+    joint_state.velocity[0] = lift_speed_;
+    joint_state.name[1] = sweep_joint_;
+    joint_state.position[1] = sweep_;
+    joint_state.velocity[1] = sweep_speed_;
+    m_joint_pub_.publish(joint_state);
 
     last_update_ = ros::Time::now();
-    last_linear_position_ = linear_position_;
-    last_rotation_position_ = angular_position_;
+    last_lift_ = lift_;
+    last_sweep_ = sweep_;
+
+    // If there is stuff on the queue deal with it
+    if(trajectory_.size() > 0)
+    {
+        double lift_tolerance = lift_tolerance_;
+        double sweep_tolerance = sweep_tolerance_;
+        ros::Duration time_tolerance = time_tolerance_;
+
+        if(as_active_)
+        {
+            if(trajectory_.size() == 1 && goal_tolerance_[lift_index_].position > 0 && goal_tolerance_[sweep_index_].position > 0)
+            {
+                lift_tolerance = goal_tolerance_[lift_index_].position;
+                sweep_tolerance = goal_tolerance_[sweep_index_].position;
+            }
+            else if(path_tolerance_[lift_index_].position > 0 && path_tolerance_[sweep_index_].position > 0)
+            {
+                lift_tolerance = path_tolerance_[lift_index_].position;
+                sweep_tolerance = path_tolerance_[sweep_index_].position;
+            }
+
+            if(goal_time_tolerance_ > time_tolerance) time_tolerance = goal_time_tolerance_;
+        }
+
+        if(fabs(trajectory_.front().positions[lift_index_] - lift_) <= lift_tolerance && fabs(trajectory_.front().positions[sweep_index_] - sweep_) <= sweep_tolerance)
+        {
+            // Remove it from the queue
+            trajectory_.pop_front();
+            if(as_active_ && trajectory_.size() == 0)
+            {
+                // And set the AS to successful!
+                control_msgs::FollowJointTrajectoryResult result;
+                result.error_code = control_msgs::FollowJointTrajectoryResult::SUCCESSFUL;
+                m_as_goal_.setSucceeded(result);
+                as_active_ = false;
+            }
+            else if(trajectory_.size() > 0)
+            {
+                // And keep on going!
+                write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+            }
+        }
+        // If we timed out...
+        else if(as_active_ && ros::Time::now() > goal_start_time_ + goal_time_tolerance_)
+        {
+            // Clear the trajectory queue
+            trajectory_.clear();
+            // And abort the AS.
+            control_msgs::FollowJointTrajectoryResult result;
+            result.error_code = control_msgs::FollowJointTrajectoryResult::GOAL_TOLERANCE_VIOLATED;
+            m_as_goal_.setAborted(result);
+            as_active_ = false;
+        }
+        else if(ros::Time::now() > start_time_ + time_tolerance)
+        {
+            if(as_active_ && goal_tolerance_[lift_index_].position != -1 && goal_tolerance_[sweep_index_].position != -1)
+            {
+                trajectory_.clear();
+
+                // And abort the AS.
+                control_msgs::FollowJointTrajectoryResult result;
+                result.error_code = control_msgs::FollowJointTrajectoryResult::PATH_TOLERANCE_VIOLATED;
+                m_as_goal_.setAborted(result);
+                as_active_ = false;
+            }
+            else if(!as_active_)
+            {
+                trajectory_.clear();
+            }
+        }
+    }
+}
+
+void FSRHuskyArm::setGoal(const trajectory_msgs::JointTrajectory::ConstPtr& msg)
+{
+    if(!homing_complete_ || !checkJointNames(&msg->joint_names) || !checkGoal(&msg->points))
+        return;
+
+    if(as_active_)
+    {
+        ROS_WARN("FSR Husky Arm - %s - Goal preempted.", __FUNCTION__);
+        // set the action state to preempted
+        m_as_goal_.setPreempted();
+        as_active_ = false;
+    }
+
+    trajectory_.clear();
+    for(int i=0 ; i<msg->points.size() ; i++)
+    {
+        trajectory_.push_back(msg->points[i]);
+    }
+
+    write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+}
+
+void FSRHuskyArm::actionServerCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
+{
+    if(!homing_complete_)
+    {
+        control_msgs::FollowJointTrajectoryResult result;
+        result.error_code = control_msgs::FollowJointTrajectoryResult::INVALID_GOAL;
+        m_as_goal_.setAborted(result);
+        ROS_ERROR("FSR Husky Arm - %s - The homing routine was not performed yer!", __FUNCTION__);
+        return;
+    }
+
+    if(!checkJointNames(&goal->trajectory.joint_names))
+    {
+        control_msgs::FollowJointTrajectoryResult result;
+        result.error_code = control_msgs::FollowJointTrajectoryResult::INVALID_JOINTS;
+        m_as_goal_.setAborted(result);
+        ROS_ERROR("FSR Husky Arm - %s - Invalid joints!", __FUNCTION__);
+        return;
+    }
+
+    if(!checkGoal(&goal->trajectory.points))
+    {
+        control_msgs::FollowJointTrajectoryResult result;
+        result.error_code = control_msgs::FollowJointTrajectoryResult::INVALID_GOAL;
+        m_as_goal_.setAborted(result);
+        ROS_ERROR("FSR Husky Arm - %s - Invalid goal!", __FUNCTION__);
+        return;
+    }
+
+    as_active_ = true;
+
+    trajectory_.clear();
+    for(int i=0 ; i<goal->trajectory.points.size() ; i++)
+    {
+        trajectory_.push_back(goal->trajectory.points[i]);
+    }
+
+    path_tolerance_ = goal->path_tolerance;
+    goal_tolerance_ = goal->goal_tolerance;
+    goal_time_tolerance_ = goal->goal_time_tolerance;
+    write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+
+    goal_start_time_ = ros::Time::now();
+
+    ros::Rate r(10.0);
+    // start executing the action
+    while(ros::ok() && as_active_)
+    {
+        // check that preempt has not been requested by the client
+        if(m_as_goal_.isPreemptRequested())
+        {
+            ROS_WARN("FSR Husky Arm - %s - Goal preempted.", __FUNCTION__);
+            // set the action state to preempted
+            m_as_goal_.setPreempted();
+            as_active_ = false;
+            break;
+        }
+
+        // Read Position & Speed
+        control_msgs::FollowJointTrajectoryFeedback feedback;
+        feedback.header.stamp = ros::Time::now();
+        feedback.joint_names.push_back(lift_joint_);
+        feedback.desired.positions.push_back(trajectory_.front().positions[lift_index_]);
+        feedback.desired.velocities.push_back(trajectory_.front().velocities[lift_index_]);
+        feedback.actual.positions.push_back(lift_);
+        feedback.actual.velocities.push_back(lift_speed_);
+        feedback.error.positions.push_back(trajectory_.front().positions[lift_index_] - lift_);
+        feedback.error.velocities.push_back(trajectory_.front().velocities[lift_index_] - lift_speed_);
+        feedback.joint_names.push_back(sweep_joint_);
+        feedback.desired.positions.push_back(trajectory_.front().positions[sweep_index_]);
+        feedback.desired.velocities.push_back(trajectory_.front().velocities[sweep_index_]);
+        feedback.actual.positions.push_back(sweep_);
+        feedback.actual.velocities.push_back(sweep_speed_);
+        feedback.error.positions.push_back(trajectory_.front().positions[sweep_index_] - sweep_);
+        feedback.error.velocities.push_back(trajectory_.front().velocities[sweep_index_] - sweep_speed_);
+        feedback.desired.time_from_start = trajectory_.front().time_from_start;
+        feedback.actual.time_from_start = ros::Time::now() - start_time_;
+        feedback.error.time_from_start = ros::Time::now() - start_time_ - trajectory_.front().time_from_start;
+        // publish the feedback
+        m_as_goal_.publishFeedback(feedback);
+
+        r.sleep();
+    }
+
+    as_active_ = false;
 }
 
 void FSRHuskyArm::asHomeCallback(const fsr_husky_driver::HomeGoalConstPtr &req)
@@ -306,19 +540,15 @@ int main(int argc, char** argv)
     ROS_INFO("FSR Husky Arm -- ROS Hardware Driver");
 
     FSRHuskyArm arm(n);
-    controller_manager::ControllerManager cm(&arm);
-
     arm.init(pn);
 
-    ros::AsyncSpinner spinner(4);
+    ros::AsyncSpinner spinner(5);
     spinner.start();
 
-    ros::Rate r(20.0);
+    ros::Rate r(10.0);
     while(ros::ok())
     {
-        arm.read();
-        cm.update(ros::Time::now(), ros::Duration(1/20.0));
-        arm.write();
+        arm.spinOnce();
         r.sleep();
     }
 

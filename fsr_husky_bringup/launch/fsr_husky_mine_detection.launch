@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="use_cameras" default="false"/>
 
 	<!-- Clearpath Husky Robot -->
 	<include file="$(find husky_base)/launch/base.launch" />
@@ -17,7 +18,7 @@
 	</node>
 
 	<!-- PointGrey Flea3 GigE Cameras -->
-	<!-- <group ns="stereo">
+	<group ns="stereo" if="$(arg use_cameras)">
 		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
 			<param name="ip_address" value="192.168.4.11" />
 			<param name="frame_id" value="left_camera" />
@@ -26,12 +27,7 @@
 			<param name="ip_address" value="192.168.4.12" />
 			<param name="frame_id" value="right_camera" />
 		</node>
-	</group> -->
-
-	<!-- Visual Odometry -->
-	<!-- <node name="stereo_odometry" pkg="viso2_ros" type="stereo_odometer" >
-		<param name="odom_frame_id" value="odom" />
-	</node> -->
+	</group>
 
 	<!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
 	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
@@ -52,17 +48,19 @@
 		<param name="host" value="192.168.4.13" />
 		<param name="frame_id" value="sick_lms100" />
 	</node>
+	
+	<!-- Convert laser scan to pointclouds -->
+	<node pkg="laser_filters" type="scan_to_cloud_filter_chain" output="screen" name="scan_to_cloud_filter_chain_tilt_laser">
+	    <remap from="scan" to="scan"/>
+	    <remap from="cloud_filtered" to="tilt_scan_cloud"/>
+	    <param name="target_frame" type="string" value="base_link"/>
+	    <!--<rosparam command="load" file="$(find fsr_husky_bringup)/settings/shadow_filter.yaml" />-->
+	</node>
 
 	<!-- PTU-D46 Pan and Tilt -->
 	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" output="screen" >
 		<param name="port" value="/dev/ptu_d46" />
 	</node>
-
-	<!-- Laser Assembler - Converts laser scans to a PointCloud2 message using the pan and tilt unit -->
-  	<node type="laser_scan_assembler" pkg="laser_assembler" name="laser_scan_assembler" output="screen">
-    		<param name="max_scans" type="int" value="100" />
-    		<param name="fixed_frame" type="string" value="base_link" />
-  	</node>
 
 	<!-- Mine Detection Arm -->
   	<node type="fsr_husky_arm_node" pkg="fsr_husky_driver" name="fsr_husky_arm" output="screen">
@@ -79,12 +77,6 @@
 	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky_mine_detection.urdf.xacro'" />
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 	<node name="joint_state_publisher" pkg="fsr_husky_description" type="joint_state_publisher" />
-	
-	<!-- Load the controllers -->
-	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
-	<rosparam file="$(find fsr_husky_bringup)/controllers/arm_controllers.yaml" command="load"/>
-    
-	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller ptu_d46_controller arm_controller"/>
 
 	<!--Sound Play -->
 	<node name="sound_play" pkg="sound_play" type="soundplay_node.py" />

@@ -80,25 +80,30 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(laser_assembler_node src/pointcloud_generator/laser_assembler.cpp)
 add_executable(cloud_assembler_node src/pointcloud_generator/cloud_assembler.cpp)
+add_executable(cloud_assembler_node_v0 src/pointcloud_generator/cloud_assembler_v0.cpp)
 add_executable(fsr_husky_arm_node src/mine_clearance_arm/fsr_husky_arm_node.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
+add_executable(fsr_husky_arm_node_v0 src/mine_clearance_arm/fsr_husky_arm_node_v0.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
 add_executable(home_node src/mine_clearance_arm/home_node.cpp)
 add_executable(sweep_node src/mine_clearance_arm/sweep_node.cpp)
+add_executable(sweep_node_v0 src/mine_clearance_arm/sweep_node_v0.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(laser_assembler_node ${catkin_LIBRARIES})
 target_link_libraries(cloud_assembler_node ${catkin_LIBRARIES})
+target_link_libraries(cloud_assembler_node_v0 ${catkin_LIBRARIES})
 target_link_libraries(fsr_husky_arm_node ${catkin_LIBRARIES} cereal_port)
+target_link_libraries(fsr_husky_arm_node_v0 ${catkin_LIBRARIES} cereal_port)
 target_link_libraries(home_node ${catkin_LIBRARIES})
 target_link_libraries(sweep_node ${catkin_LIBRARIES})
+target_link_libraries(sweep_node_v0 ${catkin_LIBRARIES})
 
-add_dependencies(laser_assembler_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(cloud_assembler_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(cloud_assembler_node_v0 ${catkin_EXPORTED_TARGETS})
 add_dependencies(fsr_husky_arm_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(fsr_husky_arm_node_v0 ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##

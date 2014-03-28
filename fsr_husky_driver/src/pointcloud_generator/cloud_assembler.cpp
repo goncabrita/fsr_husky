@@ -34,14 +34,6 @@
 *
 * Author: Gonçalo Cabrita on 28/02/2014
 *
-* This is ment to be an example file for the HRATC2104 Challenge.
-* In this example we show how to control the pan and tilt module
-* using an action server. This example is used to generate a 3D
-* point cloud by means of the laser assembler.
-*
-* With the simulator running:
-* roslaunch hratc2014_entry_template pointcloud_generator.launch
-*
 *********************************************************************/
 
 #include <ros/ros.h>
@@ -61,7 +53,7 @@ int main(int argc, char **argv)
     pn.param("tilt_speed", tilt_speed, 0.8);
 
     double lower_tilt;
-    pn.param("lower_tilt", lower_tilt, -0.5);
+    pn.param("lower_tilt", lower_tilt, -0.4);
 
     double upper_tilt;
     pn.param("upper_tilt", upper_tilt, 0.5);
@@ -92,16 +84,25 @@ int main(int argc, char **argv)
     goal.trajectory.joint_names[0] = "ptu_d46_pan_joint";
     goal.trajectory.points[0].positions.push_back(0.0);
     goal.trajectory.points[0].velocities.push_back(0.0);
+    goal.trajectory.points[0].accelerations.push_back(0.0);
+    goal.trajectory.points[0].effort.push_back(0.0);
     goal.trajectory.joint_names[1] = "ptu_d46_tilt_joint";
     goal.trajectory.points[0].positions.push_back(tilt);
     goal.trajectory.points[0].velocities.push_back(tilt_speed);
+    goal.trajectory.points[0].accelerations.push_back(0.5);
+    goal.trajectory.points[0].effort.push_back(0.0);
     goal.trajectory.points[0].time_from_start = ros::Duration(2.0);
+    goal.path_tolerance.resize(2);
+    goal.path_tolerance[0].name = "ptu_d46_pan_joint";
+    goal.path_tolerance[0].position = -1;
+    goal.path_tolerance[1].name = "ptu_d46_tilt_joint";
+    goal.path_tolerance[1].position = -1;
     goal.goal_tolerance.resize(2);
     goal.goal_tolerance[0].name = "ptu_d46_pan_joint";
     goal.goal_tolerance[0].position = 0.01;
     goal.goal_tolerance[1].name = "ptu_d46_tilt_joint";
     goal.goal_tolerance[1].position = 0.01;
-    goal.goal_time_tolerance = ros::Duration(0.1);
+    goal.goal_time_tolerance = ros::Duration(2.0);
 
     tilt_ac.sendGoal(goal);
 
@@ -129,12 +130,17 @@ int main(int argc, char **argv)
         goal.trajectory.points[0].positions.push_back(tilt = tilt == upper_tilt ? lower_tilt : upper_tilt);
         goal.trajectory.points[0].velocities.push_back(tilt_speed);
         goal.trajectory.points[0].time_from_start = ros::Duration(2.0);
+        goal.path_tolerance.resize(2);
+        goal.path_tolerance[0].name = "ptu_d46_pan_joint";
+        goal.path_tolerance[0].position = -1;
+        goal.path_tolerance[1].name = "ptu_d46_tilt_joint";
+        goal.path_tolerance[1].position = -1;
         goal.goal_tolerance.resize(2);
         goal.goal_tolerance[0].name = "ptu_d46_pan_joint";
         goal.goal_tolerance[0].position = 0.01;
         goal.goal_tolerance[1].name = "ptu_d46_tilt_joint";
         goal.goal_tolerance[1].position = 0.01;
-        goal.goal_time_tolerance = ros::Duration(0.1);
+        goal.goal_time_tolerance = ros::Duration(2.0);
 
         tilt_ac.sendGoal(goal);
 
