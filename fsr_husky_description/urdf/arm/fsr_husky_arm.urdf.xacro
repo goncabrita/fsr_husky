@@ -31,21 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
 	xmlns:xacro="http://ros.org/wiki/xacro" name="fsr_husky_arm">
 <xacro:macro name="fsr_husky_arm" params="parent x y z rx ry rz"> 
+    
   <link
-    name="base_arm_link">
+    name="arm_base_link">
     <inertial>
       <origin
-        xyz="0.0748500402726595 0.0136470618219005 -0.0925164110070736"
+        xyz="-0.1981 0.35759 0.20723"
         rpy="0 0 0" />
       <mass
-        value="0.215286927386896" />
+        value="1.1522" />
       <inertia
-        ixx="0.00151952875960782"
-        ixy="-5.00239624175035E-05"
-        ixz="-0.000104007201846032"
-        iyy="0.00181155299285244"
-        iyz="0.000216578123822788"
-        izz="0.000582288664758318" />
+        ixx="0.011095"
+        ixy="0.0012342"
+        ixz="0.00013298"
+        iyy="0.0047097"
+        iyz="0.00037003"
+        izz="0.013904" />
     </inertial>
     <visual>
       <origin
@@ -53,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/base_arm_link.STL" />
+          filename="package://fsr_husky_description/models/arm/arm_base_link.STL" />
       </geometry>
       <material
         name="Gray">
@@ -67,36 +68,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/base_arm_link.STL" />
+          filename="package://fsr_husky_description/models/arm/arm_base_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="base_arm_link">
+  <gazebo reference="arm_base_link">
         <material>Gazebo/Grey</material>
+	<selfCollide>false</selfCollide>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
-  <joint name="arm_joint" type="fixed">
-			<parent link="${parent}"/>
-			<child link="base_arm_link"/>
-			<origin xyz="${x} ${y} ${z}" rpy="${rx} ${ry} ${rz}" /> 
-  </joint>
-
+  </gazebo>
   <link
-    name="arm_axel">
+    name="arm_axel_link">
     <inertial>
       <origin
-        xyz="-6.71167554128979E-05 0.147555068632442 -5.01352348164508E-07"
+        xyz="1.9672E-08 0.14921 0.0024909"
         rpy="0 0 0" />
       <mass
-        value="0.116752432749066" />
+        value="0.14047" />
       <inertia
-        ixx="0.000715149281043979"
-        ixy="7.80945806556874E-07"
-        ixz="6.95759354868419E-10"
-        iyy="8.63256490972112E-06"
-        iyz="-1.92225108206073E-09"
-        izz="0.000715441962309322" />
+        ixx="0.00082761"
+        ixy="-1.2806E-12"
+        ixz="5.0183E-11"
+        iyy="1.9163E-05"
+        iyz="1.7051E-06"
+        izz="0.00081808" />
     </inertial>
     <visual>
       <origin
@@ -104,7 +99,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/arm_axel.STL" />
+          filename="package://fsr_husky_description/models/arm/arm_axel_link.STL" />
       </geometry>
       <material
         name="Gray">
@@ -118,49 +113,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/arm_axel.STL" />
+          filename="package://fsr_husky_description/models/arm/arm_axel_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="arm_axel">
+  <gazebo reference="arm_axel_link">
         <material>Gazebo/Grey</material>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
+  </gazebo>
   <joint
     name="arm_axel_joint"
     type="revolute">
     <origin
-      xyz="0.06 0.152 0"
-      rpy="1.5708 0 0" />
+      xyz="-0.26654 -0.21 0.2409"
+      rpy="1.5708 2.7207E-18 0.044449" />
     <parent
-      link="base_arm_link" />
+      link="arm_base_link" />
     <child
-      link="arm_axel" />
+      link="arm_axel_link" />
     <axis
       xyz="0 -1 0" />
     <limit
       lower="-1.5708"
       upper="1.5708"
-      effort="100"
-      velocity="0.5" />
+      effort="75"
+      velocity="2" />
+    <!--<safety_controller
+      soft_upper="1.5"
+      soft_lower="-1.5"
+      k_position="1"
+	k_velocity="0" />-->
   </joint>
-
   <link
-    name="upper_arm">
+    name="upper_arm_link">
     <inertial>
       <origin
-        xyz="0.000102539584510564 0.025319004836415 0.373317706752181"
+        xyz="-0.045308 0.03667 0.27592"
         rpy="0 0 0" />
       <mass
-        value="0.310661228623748" />
+        value="1.2589" />
       <inertia
-        ixx="0.0301188716585458"
-        ixy="-4.68610675580059E-08"
-        ixz="1.48034298202518E-05"
-        iyy="0.0301182394443099"
-        iyz="-0.000152720615635198"
-        izz="8.7451640283179E-05" />
+        ixx="0.038361"
+        ixy="2.2286E-05"
+        ixz="0.0034205"
+        iyy="0.040565"
+        iyz="-0.00011324"
+        izz="0.0027942" />
     </inertial>
     <visual>
       <origin
@@ -168,7 +166,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/upper_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/upper_arm_link.STL" />
       </geometry>
       <material
         name="DarkGray">
@@ -182,49 +180,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/upper_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/upper_arm_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="upper_arm">
+  <gazebo reference="upper_arm_link">
         <material>Gazebo/Grey</material>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
+  </gazebo>
   <joint
     name="upper_arm_joint"
     type="revolute">
     <origin
-      xyz="0 0.1459 -0.0096445"
-      rpy="-1.5708 0 -1.5708" />
+      xyz="0 0.149 0"
+      rpy="1.5708 -1.2212E-13 -1.5708" />
     <parent
-      link="arm_axel" />
+      link="arm_axel_link" />
     <child
-      link="upper_arm" />
+      link="upper_arm_link" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
     <limit
-      lower="-0.5"
-      upper="0.25"
-      effort="20"
-      velocity="0.5" />
+      lower="-0.5236"
+      upper="0.5236"
+      effort="35"
+      velocity="2" />
   </joint>
-
   <link
-    name="metal_detector_arm">
+    name="metal_detector_arm_link">
     <inertial>
       <origin
-        xyz="0.00200170148149059 -0.0639004587205252 -0.0667324909004516"
+        xyz="0.0020016 -0.063902 -0.072539"
         rpy="0 0 0" />
       <mass
-	value="0.00001" /><!--value="0.730115545526703" />-->
+        value="0.73012" />
       <inertia
-        ixx="0.00564260404067653"
-        ixy="4.21272987506857E-05"
-        ixz="4.78655101148471E-05"
-        iyy="0.00114533989924875"
-        iyz="0.00095063627641457"
-        izz="0.00479397824386875" />
+        ixx="0.0056833"
+        ixy="4.2128E-05"
+        ixz="4.9113E-05"
+        iyy="0.0011861"
+        iyz="0.00096268"
+        izz="0.0047939" />
     </inertial>
     <visual>
       <origin
@@ -232,12 +228,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/metal_detector_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/metal_detector_arm_link.STL" />
       </geometry>
       <material
         name="DarkGray">
         <color
-          rgba="0.494117647058824 0.494117647058824 0.494117647058824 1" />
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
       </material>
     </visual>
     <collision>
@@ -246,49 +242,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/metal_detector_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/metal_detector_arm_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="metal_detector_arm">
+  <gazebo reference="metal_detector_arm_link">
         <material>Gazebo/Grey</material>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
+  </gazebo>
   <joint
     name="metal_detector_arm_joint"
     type="revolute">
+    <origin
+      xyz="0 0.0062947 0.8475"
+      rpy="1.5708 -1.5708 0" />
+    <parent
+      link="upper_arm_link" />
+    <child
+      link="metal_detector_arm_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.5236"
+      upper="0.5236"
+      effort="35"
+      velocity="2" />
     <mimic
       joint="upper_arm_joint"
       multiplier="-1" />
-    <origin
-      xyz="0 0 0.8475"
-      rpy="1.5708 -1.5708 0" />
-    <parent
-      link="upper_arm" />
-    <child
-      link="metal_detector_arm" />
-    <axis
-      xyz="0 0 -1" />
-    <limit
-      lower="-0.25"
-      upper="0.5"
-      effort="20"
-      velocity="0.5" />
   </joint>
-
   <link
-    name="metal_detector_antenna">
+    name="metal_detector_antenna_link">
     <inertial>
       <origin
-        xyz="3.6833E-07 0.011468 -0.12477"
+        xyz="3.7915E-07 0.011468 -0.12477"
         rpy="0 0 0" />
       <mass
-	value="12.099" />
+        value="12.099" />
       <inertia
         ixx="0.060468"
-        ixy="-4.3221E-09"
-        ixz="5.3405E-07"
+        ixy="-4.2864E-09"
+        ixz="5.461E-07"
         iyy="0.27654"
         iyz="-0.0010461"
         izz="0.21765" />
@@ -299,7 +293,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/metal_detector_antenna.STL" />
+          filename="package://fsr_husky_description/models/arm/metal_detector_antenna_link.STL" />
       </geometry>
       <material
         name="ArmyGreen">
@@ -313,90 +307,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/metal_detector_antenna.STL" />
+          filename="package://fsr_husky_description/models/arm/metal_detector_antenna_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="metal_detector_antenna">
+  <gazebo reference="metal_detector_antenna_link">
         <material>Gazebo/Green</material>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
+  </gazebo>
   <joint
     name="metal_detector_antenna_joint"
     type="fixed">
     <origin
-      xyz="0 -0.33276 0.095344"
-      rpy="0 0 0" />
+      xyz="0 -0.33276 0.090995"
+      rpy="2.7728E-15 2.7756E-15 1.2333E-16" />
     <parent
-      link="metal_detector_arm" />
+      link="metal_detector_arm_link" />
     <child
-      link="metal_detector_antenna" />
+      link="metal_detector_antenna_link" />
     <axis
       xyz="0 0 0" />
   </joint>
-  
-  <link name="left_coil">
-      <visual>
-          <origin xyz="0 0 0" rpy="0 0 0" />
-          <geometry>
-              <box size="0.001 0.001 0.001" />
-          </geometry>
-      </visual>
-  </link>
-  
-  <joint name="left_coil_joint" type="fixed">
-      <origin xyz="0.18 0 0" rpy="0 0 0" />
-      <parent link="metal_detector_antenna"/>
-      <child link="left_coil" />
-  </joint>
-  
-  <link name="middle_coil">
-      <visual>
-          <origin xyz="0 0 0" rpy="0 0 0" />
-          <geometry>
-              <box size="0.001 0.001 0.001" />
-          </geometry>
-      </visual>
-  </link>
-  
-  <joint name="middle_coil_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <parent link="metal_detector_antenna"/>
-      <child link="middle_coil" />
-  </joint>
-  
-  <link name="right_coil">
-      <visual>
-          <origin xyz="0 0 0" rpy="0 0 0" />
-          <geometry>
-              <box size="0.001 0.001 0.001" />
-          </geometry>
-      </visual>
-  </link>
-  
-  <joint name="right_coil_joint" type="fixed">
-      <origin xyz="-0.18 0 0" rpy="0 0 0" />
-      <parent link="metal_detector_antenna"/>
-      <child link="right_coil" />
-  </joint>
-
-
   <link
-    name="lower_arm">
+    name="lower_arm_link">
     <inertial>
       <origin
-        xyz="-4.03262433168461E-08 0.0238835580685394 0.38020982511275"
+        xyz="-3.74E-08 0.061694 0.38021"
         rpy="0 0 0" />
       <mass
-        value="0.315289032495142" />
+        value="0.31529" />
       <inertia
-        ixx="0.0311225242878348"
-        ixy="-2.44666563034439E-10"
-        ixz="3.98116348654419E-09"
-        iyy="0.0311222097229973"
-        iyz="-0.000155853742938512"
-        izz="8.78358578959995E-05" />
+        ixx="0.031123"
+        ixy="-2.3256E-10"
+        ixz="3.6524E-09"
+        iyy="0.031122"
+        iyz="-0.00015585"
+        izz="8.7836E-05" />
     </inertial>
     <visual>
       <origin
@@ -404,7 +350,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/lower_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/lower_arm_link.STL" />
       </geometry>
       <material
         name="DarkGray">
@@ -418,36 +364,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://fsr_husky_description/models/arm/lower_arm.STL" />
+          filename="package://fsr_husky_description/models/arm/lower_arm_link.STL" />
       </geometry>
     </collision>
   </link>
-  <gazebo reference="lower_arm">
+  <gazebo reference="lower_arm_link">
         <material>Gazebo/Grey</material>
         <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-
+  </gazebo>
   <joint
     name="lower_arm_joint"
     type="revolute">
+    <origin
+      xyz="0 0.084 -0.023752"
+      rpy="1.5708 -1.2212E-13 -1.5708" />
+    <parent
+      link="arm_axel_link" />
+    <child
+      link="lower_arm_link" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="-0.5236"
+      upper="0.5236"
+      effort="35"
+      velocity="2" />
     <mimic
       joint="upper_arm_joint" />
-    <origin
-      xyz="0 0.0809 -0.011058"
-      rpy="-1.5708 0 -1.5708" />
-    <parent
-      link="arm_axel" />
-    <child
-      link="lower_arm" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-0.5"
-      upper="0.25"
-      effort="20"
-      velocity="0.5" />
   </joint>
   
+  <joint name="arm_base_joint" type="fixed">
+			<parent link="${parent}"/>
+			<child link="arm_base_link"/>
+			<origin xyz="${x} ${y} ${z}" rpy="${rx} ${ry} ${rz}" />
+  </joint>
+  
+  <!-- Coils -->
+  <link name="left_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+    
+  <joint name="left_coil_joint" type="fixed">
+      <origin xyz="0.18 0 -0.09" rpy="0 0 0" />
+      <parent link="metal_detector_antenna_link"/>
+      <child link="left_coil" />
+  </joint>
+  
+  <link name="middle_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+  
+  <joint name="middle_coil_joint" type="fixed">
+      <origin xyz="0 0 -0.09" rpy="0 0 0" />
+      <parent link="metal_detector_antenna_link"/>
+      <child link="middle_coil" />
+  </joint>
+  
+  <link name="right_coil">
+      <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+              <box size="0.001 0.001 0.001" />
+          </geometry>
+      </visual>
+  </link>
+  
+  <joint name="right_coil_joint" type="fixed">
+      <origin xyz="-0.18 0 -0.09" rpy="0 0 0" />
+      <parent link="metal_detector_antenna_link"/>
+      <child link="right_coil" />
+    </joint>
+  
+  <!-- Transmissions -->
   <transmission name="lift">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="upper_arm_joint"/>
@@ -484,6 +482,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </actuator>
   </transmission>
   
+  <!-- Gazebo mimic plugins -->
   <gazebo>
 	<plugin name="mimic_plugin1" filename="libmimic_plugin.so">
             <joint>upper_arm_joint</joint>

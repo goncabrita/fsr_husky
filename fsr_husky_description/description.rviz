@@ -64,7 +64,12 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_axel:
+        arm_axel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -80,11 +85,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         back_right_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_arm_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -110,6 +110,11 @@ Visualization Manager:
           Show Trail: false
           Value: true
         base_footprint_user_rail_part:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_imu:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -154,22 +159,32 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        left_coil:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         left_lense:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lower_arm:
+        lower_arm_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        metal_detector_antenna:
+        metal_detector_antenna_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        metal_detector_arm:
+        metal_detector_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        middle_coil:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -204,6 +219,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        right_coil:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         right_lense:
           Alpha: 1
           Show Axes: false
@@ -214,7 +234,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        upper_arm:
+        upper_arm_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -268,17 +288,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.9204
+      Distance: 2.44897
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 0.355559
+        Y: 0.370225
+        Z: 0.484742
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.499796
+      Pitch: 0.134796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0253864
+      Yaw: 5.24857
     Saved: ~
 Window Geometry:
   Displays:

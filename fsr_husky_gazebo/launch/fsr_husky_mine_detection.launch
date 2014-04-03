@@ -44,5 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
       respawn="false" output="screen">
     </node>
+    
+    <!-- Convert laser scan to pointclouds -->
+    <node pkg="laser_filters" type="scan_to_cloud_filter_chain" output="screen" name="scan_to_cloud_filter_chain_tilt_laser">
+	    <remap from="scan" to="scan"/>
+	    <remap from="cloud_filtered" to="tilt_scan_cloud"/>
+	    <param name="target_frame" type="string" value="base_link"/>
+	    <!--<rosparam command="load" file="$(find fsr_husky_bringup)/settings/shadow_filter.yaml" />-->
+    </node>
 
 </launch>

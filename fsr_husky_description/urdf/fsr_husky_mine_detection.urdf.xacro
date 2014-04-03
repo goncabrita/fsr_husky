@@ -205,7 +205,7 @@ Husky A200 file and modified by the ISR University of Coimbra
     <!-- FSR Husky Stuff -->
 
     <!-- BRIDGE macros -->
-    <husky_bridge prefix="front" parent="base_link" x="0.17" y="0" z="${base_z_size}" rx="0" ry="0" rz="0" />
+    <husky_bridge prefix="front" parent="base_link" x="0.09" y="0" z="${base_z_size}" rx="0" ry="0" rz="0" />
     <husky_bridge prefix="back" parent="base_link" x="-0.18" y="0" z="${base_z_size}" rx="0" ry="0" rz="0" />
 
     <!-- MTi macro -->
@@ -228,7 +228,7 @@ Husky A200 file and modified by the ISR University of Coimbra
     <alfa_tube2h parent="back_husky_bridge" x="0" y="-0.17" z="0" rx="0" ry="0" rz="0" />
 
     <!-- FSR Husky De-mining Arm -->
-    <fsr_husky_arm parent="base_link" x="0.120" y="-0.15" z="${base_z_size}" rx="0" ry="0" rz="0" />
+    <fsr_husky_arm parent="base_link" x="-0.025" y="-0.21" z="0.007" rx="0" ry="0" rz="3.14" />
     
     <gazebo>
       <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  
+  	<node type="sweep_node" pkg="fsr_husky_driver" name="sweep_node" output="screen">
+	  <rosparam param="virtual_sensors">[ 0.0, 0.0, 0.1, 0.0, 0.0, -1.57079633,
+                                              0.0, 0.0, -0.38, 0.0, 0.0, -1.57079633,
+                                              0.40, 0.0, -0.09, 0.0, 0.0, -1.57079633,
+                                              -0.40, 0.0, -0.09, 0.0, 0.0, -1.57079633, ]</rosparam>
+	  <!--<param name="height" value="0.02" />-->
+	</node>
+
+</launch>
