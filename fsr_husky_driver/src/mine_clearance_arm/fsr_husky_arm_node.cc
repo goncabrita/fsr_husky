@@ -322,22 +322,25 @@ void FSRHuskyArm::spinOnce()
     control_msgs::JointTrajectoryControllerState joint_state;
     joint_state.header.stamp = ros::Time::now();
     joint_state.joint_names.push_back(lift_joint_);
-    joint_state.desired.positions.push_back(trajectory_.front().positions[lift_index_]);
-    joint_state.desired.velocities.push_back(trajectory_.front().velocities[lift_index_]);
     joint_state.actual.positions.push_back(lift_);
     joint_state.actual.velocities.push_back(lift_speed_);
-    joint_state.error.positions.push_back(trajectory_.front().positions[lift_index_] - lift_);
-    joint_state.error.velocities.push_back(trajectory_.front().velocities[lift_index_] - lift_speed_);
     joint_state.joint_names.push_back(sweep_joint_);
-    joint_state.desired.positions.push_back(trajectory_.front().positions[sweep_index_]);
-    joint_state.desired.velocities.push_back(trajectory_.front().velocities[sweep_index_]);
     joint_state.actual.positions.push_back(sweep_);
     joint_state.actual.velocities.push_back(sweep_speed_);
-    joint_state.error.positions.push_back(trajectory_.front().positions[sweep_index_] - sweep_);
-    joint_state.error.velocities.push_back(trajectory_.front().velocities[sweep_index_] - sweep_speed_);
-    joint_state.desired.time_from_start = trajectory_.front().time_from_start;
-    joint_state.actual.time_from_start = ros::Time::now() - start_time_;
-    joint_state.error.time_from_start = ros::Time::now() - start_time_ - trajectory_.front().time_from_start;
+    if(trajectory_.size() > 0)
+    {
+        joint_state.desired.positions.push_back(trajectory_.front().positions[lift_index_]);
+        joint_state.desired.velocities.push_back(trajectory_.front().velocities[lift_index_]);
+        joint_state.error.positions.push_back(trajectory_.front().positions[lift_index_] - lift_);
+        joint_state.error.velocities.push_back(trajectory_.front().velocities[lift_index_] - lift_speed_);
+        joint_state.desired.positions.push_back(trajectory_.front().positions[sweep_index_]);
+        joint_state.desired.velocities.push_back(trajectory_.front().velocities[sweep_index_]);
+        joint_state.error.positions.push_back(trajectory_.front().positions[sweep_index_] - sweep_);
+        joint_state.error.velocities.push_back(trajectory_.front().velocities[sweep_index_] - sweep_speed_);
+        joint_state.desired.time_from_start = trajectory_.front().time_from_start;
+        joint_state.actual.time_from_start = ros::Time::now() - start_time_;
+        joint_state.error.time_from_start = ros::Time::now() - start_time_ - trajectory_.front().time_from_start;
+    }
     m_joint_pub_.publish(joint_state);
 
     last_update_ = ros::Time::now();
