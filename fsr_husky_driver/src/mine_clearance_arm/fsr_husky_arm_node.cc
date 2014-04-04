@@ -4,6 +4,7 @@
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <fsr_husky_driver/HomeAction.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
+#include <sensor_msgs/JointState.h>
 
 #include "jrk_driver.h"
 #include "nanotec_driver.h"
@@ -16,7 +17,10 @@ class FSRHuskyArm
         void init(ros::NodeHandle &pnh);
         void spinOnce();
 
+        void jointStateSpinner();
+
     private:
+        ros::Publisher  m_joint_state_pub_;
         ros::Publisher  m_joint_pub_;
         ros::Subscriber m_joint_sub_;
 
@@ -71,6 +75,8 @@ class FSRHuskyArm
         int sweep_index_;
 
         int max_sweep_steps_;
+
+        double joint_state_rate_;
 };
 
 FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
@@ -83,6 +89,8 @@ FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
 
     // Subscribers : Only subscribe to the most recent instructions
     m_joint_sub_ = nh.subscribe("/arm_controller/command", 1, &FSRHuskyArm::setGoal, this);
+
+    m_joint_state_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 50);
 
     homing_complete_ = false;
 }
@@ -128,6 +136,8 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     double time_tolerance;
     pnh.param("time_tolerance", time_tolerance, 0.5);
     time_tolerance_ = ros::Duration(time_tolerance);
+
+    pnh.param("joint_state_rate", joint_state_rate_, 50.0);
 
     bool go_home;
     pnh.param("home", go_home, false);
@@ -291,6 +301,28 @@ bool FSRHuskyArm::checkGoal(const std::vector<trajectory_msgs::JointTrajectoryPo
                 points->at(i).velocities[sweep_index_] > max_sweep_speed_) return false;
     }
     return true;
+}
+
+void FSRHuskyArm::jointStateSpinner()
+{
+    ros::Rate r(joint_state_rate_);
+    while(ros::ok())
+    {
+        sensor_msgs::JointState msg;
+
+        msg.header.stamp = ros::Time::now();
+        msg.name.push_back(lift_joint_);
+        msg.position.push_back(lift_);
+        msg.velocity.push_back(lift_speed_);
+        msg.effort.push_back(0.0);
+        msg.name.push_back(sweep_joint_);
+        msg.position.push_back(sweep_);
+        msg.velocity.push_back(sweep_speed_);
+        msg.effort.push_back(0.0);
+
+        m_joint_state_pub_.publish(msg);
+        r.sleep();
+    }
 }
 
 void FSRHuskyArm::spinOnce()
@@ -556,12 +588,16 @@ int main(int argc, char** argv)
     ros::AsyncSpinner spinner(5);
     spinner.start();
 
+    boost::thread joint_state_thread(&FSRHuskyArm::jointStateSpinner, &arm);
+
     ros::Rate r(10.0);
     while(ros::ok())
     {
         arm.spinOnce();
         r.sleep();
     }
+
+    joint_state_thread.join();
 
     spinner.stop();
 
