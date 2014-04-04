@@ -114,12 +114,12 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     pnh.param<std::string>("lift_joint", lift_joint_, "upper_arm_joint");
     pnh.param<std::string>("sweep_joint", sweep_joint_, "arm_axel_joint");
 
-    pnh.param("min_lift", min_lift_, -0.5);
-    pnh.param("max_lift", max_lift_, 0.5);
+    pnh.param("min_lift", min_lift_, -0.25);
+    pnh.param("max_lift", max_lift_, 0.25);
     pnh.param("max_lift_speed", max_lift_speed_, 1.0);
 
-    pnh.param("min_sweep", min_sweep_, -0.8);
-    pnh.param("max_sweep", max_sweep_, 0.8);
+    pnh.param("min_sweep", min_sweep_, -1.5);
+    pnh.param("max_sweep", max_sweep_, 1.5);
     pnh.param("max_sweep_speed", max_sweep_speed_, 1.0);
 
     pnh.param("lift_tolerance", lift_tolerance_, 0.05);
