@@ -90,7 +90,7 @@ FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
     // Subscribers : Only subscribe to the most recent instructions
     m_joint_sub_ = nh.subscribe("/arm_controller/command", 1, &FSRHuskyArm::setGoal, this);
 
-    m_joint_state_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 50);
+    m_joint_state_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 200);
 
     homing_complete_ = false;
 }
@@ -137,7 +137,7 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     pnh.param("time_tolerance", time_tolerance, 0.5);
     time_tolerance_ = ros::Duration(time_tolerance);
 
-    pnh.param("joint_state_rate", joint_state_rate_, 70.0);
+    pnh.param("joint_state_rate", joint_state_rate_, 100.0);
 
     bool go_home;
     pnh.param("home", go_home, false);
