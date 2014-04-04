@@ -137,7 +137,7 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     pnh.param("time_tolerance", time_tolerance, 0.5);
     time_tolerance_ = ros::Duration(time_tolerance);
 
-    pnh.param("joint_state_rate", joint_state_rate_, 50.0);
+    pnh.param("joint_state_rate", joint_state_rate_, 70.0);
 
     bool go_home;
     pnh.param("home", go_home, false);
