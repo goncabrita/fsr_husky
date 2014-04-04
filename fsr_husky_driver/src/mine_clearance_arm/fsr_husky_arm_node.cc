@@ -319,6 +319,14 @@ void FSRHuskyArm::jointStateSpinner()
         msg.position.push_back(sweep_);
         msg.velocity.push_back(sweep_speed_);
         msg.effort.push_back(0.0);
+        msg.name.push_back("lower_arm_joint");
+        msg.position.push_back(lift_);
+        msg.velocity.push_back(lift_speed_);
+        msg.effort.push_back(0.0);
+        msg.name.push_back("metal_detector_arm_joint");
+        msg.position.push_back(-1.0*lift_);
+        msg.velocity.push_back(-1.0*lift_speed_);
+        msg.effort.push_back(0.0);
 
         m_joint_state_pub_.publish(msg);
         r.sleep();
