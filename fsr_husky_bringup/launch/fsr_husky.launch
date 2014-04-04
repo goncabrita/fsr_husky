@@ -67,6 +67,9 @@
 	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" output="screen" >
 		<param name="port" value="/dev/ptu_d46" />
 	</node>
+	
+	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller"/>
 
 	<!-- FSR Husky URDF -->
 	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky.urdf.xacro'" />

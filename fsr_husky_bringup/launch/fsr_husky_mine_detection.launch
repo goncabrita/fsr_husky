@@ -72,6 +72,9 @@
 	<node type="vallon_vmp3_node" pkg="vallon_vmp3_driver" name="metal_detector" output="screen">
     		<param name="port" type="string" value="/dev/metal_detector" />
   	</node>
+	
+	<rosparam file="$(find fsr_husky_bringup)/controllers/controllers.yaml" command="load"/>
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller"/>
 
 	<!-- FSR Husky URDF -->
 	<param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky_mine_detection.urdf.xacro'" />
