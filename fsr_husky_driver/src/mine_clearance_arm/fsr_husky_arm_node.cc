@@ -249,7 +249,7 @@ void FSRHuskyArm::write(double lift, double lift_speed, double sweep, double swe
     double l = lift;
     if(l < min_lift_) l = min_lift_;
     if(l > max_lift_) l = max_lift_;
-    int goal_l = (l - min_lift_)*4048/(max_lift_ - min_lift_);
+    int goal_l = -1.0*(l - min_lift_)*4048/(max_lift_ - min_lift_);
 
     double a = sweep;
     if(a < min_sweep_) a = min_sweep_;
@@ -305,7 +305,7 @@ void FSRHuskyArm::spinOnce()
     }
     //ROS_INFO("linear position:%d", linear_position);
     ros::Duration delta_t = ros::Time::now() - last_update_;
-    lift_ = linear_position*(max_lift_ - min_lift_)/4048 + min_lift_;
+    lift_ = -1.0*linear_position*(max_lift_ - min_lift_)/4048 + min_lift_;
     lift_speed_ = (lift_ - last_lift_)/delta_t.toSec();
 
     int rotation_position;

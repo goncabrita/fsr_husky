@@ -40,6 +40,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
+#include <control_msgs/JointTrajectoryControllerState.h>
 #include <sensor_msgs/JointState.h>
 
 #include <tf/transform_listener.h>
@@ -53,6 +54,9 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl_conversions/pcl_conversions.h>
+
+#define ARM_LENGTH 0.8475
 
 typedef pcl::PointXYZ PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
@@ -66,7 +70,7 @@ public:
 
 private:
     void pointCloudCallback(const PointCloud::ConstPtr& msg);
-    void jointsCallback(const sensor_msgs::JointState::ConstPtr& msg);
+    void jointsCallback(const control_msgs::JointTrajectoryControllerState::ConstPtr& msg);
 
     ros::Subscriber cloud_sub_;
     //message_filters::Subscriber<PointCloud> cloud_sub_;
@@ -74,6 +78,8 @@ private:
     //tf::MessageFilter<PointCloud> * tf_filter_;
 
     ros::Publisher roi_cloud_pub_;
+    ros::Publisher virtual_sensors_pub_;
+    ros::Publisher points_pub_;
     ros::Publisher joints_pub_;
     ros::Subscriber joints_sub_;
 
@@ -95,6 +101,9 @@ private:
     double current_lift_;
     double current_sweep_;
 
+    double last_lift_;
+    double last_sweep_;
+
     double min_lift_;
     double max_lift_;
     double max_lift_speed_;
@@ -111,11 +120,14 @@ private:
     double filter_box_size_;
 
     double distance(const PointT &p1, const PointT &p2);
+
+    ros::Time last_change_of_direction_;
+    ros::Duration time_between_change_of_directions_;
 };
 
 Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
 {
-    pn.param<std::string>("metal_detector_frame_id", metal_detector_frame_id_, "metal_detector_antenna");
+    pn.param<std::string>("metal_detector_frame_id", metal_detector_frame_id_, "metal_detector_antenna_link");
 
     // Lets load the list of virtual sensors...
     XmlRpc::XmlRpcValue list_of_virtual_sensors;
@@ -157,9 +169,11 @@ Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
     tf_filter_->registerCallback( boost::bind(&Sweeper::pointCloudCallback, this, _1) );*/
 
     roi_cloud_pub_ = n.advertise<PointCloud>("roi_cloud", 1);
+    virtual_sensors_pub_ = n.advertise<geometry_msgs::PoseStamped>("virtual_sensors/pose", 10);
+    points_pub_ = n.advertise<geometry_msgs::PointStamped>("virtual_sensors/distance", 10);
 
     joints_pub_ = n.advertise<trajectory_msgs::JointTrajectory>("/arm_controller/command", 10);
-    joints_sub_ = n.subscribe("/arm_controller_state", 10, &Sweeper::jointsCallback, this);
+    joints_sub_ = n.subscribe("/arm_controller/state", 10, &Sweeper::jointsCallback, this);
 
     pn.param<std::string>("lift_joint", lift_joint_, "upper_arm_joint");
     pn.param<std::string>("sweep_joint", sweep_joint_, "arm_axel_joint");
@@ -168,16 +182,23 @@ Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
     pn.param("max_lift", max_lift_, 0.5);
     pn.param("max_lift_speed", max_lift_speed_, 0.8);
 
-    pn.param("min_sweep", min_sweep_, -0.8);
-    pn.param("max_sweep", max_sweep_, 0.8);
+    pn.param("min_sweep", min_sweep_, -0.6);
+    pn.param("max_sweep", max_sweep_, 0.6);
     pn.param("sweep_speed", sweep_speed_, 0.8);
     pn.param("sweep_tolerance", sweep_tolerance_, 0.05);
 
-    pn.param("height", height_, 0.02);
+    pn.param("height", height_, 0.10);
 
     pn.param("k", k_, 1.0);
 
     pn.param("filter_box_size", filter_box_size_, 10.0);
+
+    double time_between_change_of_directions;
+    pn.param("time_between_change_of_directions", time_between_change_of_directions, 1.0);
+    time_between_change_of_directions_ = ros::Duration(time_between_change_of_directions);
+    last_change_of_direction_ = ros::Time::now();
+
+    cloud_filtered_ = pcl::PointCloud<PointT>::Ptr(new pcl::PointCloud<PointT>);
 }
 
 void Sweeper::pointCloudCallback(const PointCloud::ConstPtr& msg)
@@ -218,12 +239,17 @@ void Sweeper::pointCloudCallback(const PointCloud::ConstPtr& msg)
     corners[7].point.y = filter_box_size_/-2.0;
     corners[7].point.z = filter_box_size_/-2.0;
 
+    pcl_conversions::fromPCL(msg->header, corners[0].header);
+    corners[0].header.frame_id = base_link_frame_id_;
+    tf_.waitForTransform(msg->header.frame_id, corners[0].header.frame_id, corners[0].header.stamp, ros::Duration(0.1));
     for(int i=0 ; i<8 ; i++)
     {
-        corners[i].header.frame_id = base_link_frame_id_;
-        corners[i].header.stamp = ros::Time(msg->header.stamp);
+        corners[i].header = corners[0].header;
 
-        try { tf_.transformPoint(msg->header.frame_id, corners[i], corners[i]); }
+        try
+        {
+            tf_.transformPoint(msg->header.frame_id, corners[i], corners[i]);
+        }
         catch(tf::TransformException &ex)
         {
             ROS_ERROR("Sweeper - %s - Error: %s", __FUNCTION__, ex.what());
@@ -263,14 +289,17 @@ void Sweeper::pointCloudCallback(const PointCloud::ConstPtr& msg)
     roi_cloud_pub_.publish(cloud_filtered_);
 
     got_cloud_ = true;
+    ROS_INFO("Sweeper - %s - Filtered the cloud!!!", __FUNCTION__);
 }
 
-void Sweeper::jointsCallback(const sensor_msgs::JointState::ConstPtr& msg)
+void Sweeper::jointsCallback(const control_msgs::JointTrajectoryControllerState::ConstPtr& msg)
 {
-    for(int i=0 ; i<msg->name.size() ; i++)
+    //ROS_INFO("Sweeper - %s - Got joints info! %s %lf %s %lf", __FUNCTION__, msg->joint_names[0].c_str(), msg->actual.positions[0], msg->joint_names[1].c_str(), msg->actual.positions[1]);
+
+    for(int i=0 ; i<msg->joint_names.size() ; i++)
     {
-        if(lift_joint_.compare(msg->name[i]) == 0) current_lift_ = msg->position[i];
-        else if(sweep_joint_.compare(msg->name[i]) == 0) current_sweep_ = msg->position[i];
+        if(lift_joint_.compare(msg->joint_names[i]) == 0) current_lift_ = msg->actual.positions[i];
+        else if(sweep_joint_.compare(msg->joint_names[i]) == 0) current_sweep_ = msg->actual.positions[i];
     }
 }
 
@@ -279,23 +308,36 @@ void Sweeper::spinOnce()
     if(!got_cloud_) return;
 
     // Step 1. Check if we should invert the sweep direction
-    if(fabs(current_sweep_ - sweep_) <= sweep_tolerance_) sweep_ = sweep_ == min_sweep_ ? max_sweep_ : min_sweep_;
+    if(fabs(current_sweep_ - sweep_) <= sweep_tolerance_ && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)
+    {
+        sweep_ = sweep_ == min_sweep_ ? max_sweep_ : min_sweep_;
+        last_change_of_direction_ = ros::Time::now();
+    }
 
     // Step 2. Convert the virtual sensors into the frame of the cloud
     std::vector<geometry_msgs::PoseStamped> virtual_sensors = virtual_sensors_;
+    virtual_sensors[0].header.stamp = ros::Time::now();
+    tf_.waitForTransform(cloud_filtered_->header.frame_id, virtual_sensors[0].header.frame_id, virtual_sensors[0].header.stamp, ros::Duration(0.1));
     for(int i=0 ; i<virtual_sensors.size() ; i++)
     {
-        virtual_sensors[i].header.stamp = ros::Time::now();
-        try { tf_.transformPose(cloud_filtered_->header.frame_id, virtual_sensors[i], virtual_sensors[i]); }
+        virtual_sensors[i].header.stamp = virtual_sensors[0].header.stamp;
+
+        try
+        {
+            tf_.transformPose(cloud_filtered_->header.frame_id, virtual_sensors[i], virtual_sensors[i]);
+        }
         catch(tf::TransformException &ex)
         {
             ROS_ERROR("Sweeper - %s - Error: %s", __FUNCTION__, ex.what());
             return;
         }
+
+        virtual_sensors_pub_.publish(virtual_sensors[i]);
     }
 
     // Step 3. Find the distance to the ground of all sensors a pick the closest to the ground
     std::vector<double> distances;
+    for(int i=0 ; i<virtual_sensors.size() ; i++) distances.push_back(2.0);
     BOOST_FOREACH(const PointT& pt, cloud_filtered_->points)
     {
         for(int i=0 ; i<virtual_sensors.size() ; i++)
@@ -308,7 +350,7 @@ void Sweeper::spinOnce()
             // First we convert pt into a point p along the axis on the same plane perpendicular to the axis
             tf::Quaternion q;
             tf::quaternionMsgToTF(virtual_sensors[i].pose.orientation, q);
-            tf::Vector3 axis = tf::quatRotate(q, tf::Vector3(0, 1, 0));
+            tf::Vector3 axis = tf::quatRotate(q, tf::Vector3(1, 0, 0));
             double t = (axis.x()*(pt.x - sensor.x) + axis.y()*(pt.y - sensor.y) + axis.z()*(pt.z - sensor.z))/(pow(axis.x(),2) + pow(axis.y(),2) + pow(axis.z(),2));
 
             PointT p;
@@ -321,26 +363,48 @@ void Sweeper::spinOnce()
             {
                 double d = distance(sensor, p);
                 PointT pd;
-                pd.x = axis.x() * d;
-                pd.y = axis.y() * d;
-                pd.z = axis.z() * d;
+                pd.x = sensor.x + axis.x() * d;
+                pd.y = sensor.y + axis.y() * d;
+                pd.z = sensor.z + axis.z() * d;
                 if(distance(pd, p) > 0.01) d *= -1;
-                if(distances.size() < virtual_sensors.size()) distances.push_back(d);
-                else if(d < distances[i]) distances[i] = d;
+                if(d < distances[i]) distances[i] = d;
             }
         }
     }
 
+    /*tf::Quaternion q;
+    tf::quaternionMsgToTF(virtual_sensors[0].pose.orientation, q);
+    tf::Vector3 axis = tf::quatRotate(q, tf::Vector3(1, 0, 0));
+
+    geometry_msgs::PointStamped point;
+    point.header.frame_id = virtual_sensors[0].header.frame_id;
+    point.header.stamp = ros::Time::now();
+    point.point.x = virtual_sensors[0].pose.position.x + 0.5 * axis.x();
+    point.point.y = virtual_sensors[0].pose.position.y + 0.5 * axis.y();
+    point.point.z = virtual_sensors[0].pose.position.z + 0.5 * axis.z();
+
+    points_pub_.publish(point);*/
+
     // Step 4. Determine the new lift angle based on the distance to the ground
-    double error = *std::min_element(distances.begin(), distances.end()) - height_;
-    lift_ = current_lift_ + error * k_;
+    double min_distance = double(*std::min_element(distances.begin(), distances.end()));
+    double delta_h = height_ - min_distance;
+    double current_h = ARM_LENGTH * sin(current_lift_);
+    double desired_h = current_h + delta_h;
+    if(desired_h > ARM_LENGTH) desired_h = ARM_LENGTH;
+    else if(desired_h < -1.0*ARM_LENGTH) desired_h = -1.0*ARM_LENGTH;
+    lift_ = asin(desired_h/ARM_LENGTH);
+
+    ROS_INFO("Sweeper - %s - Min distance to the ground is %lf, delta is %lf, current h is %lf and the desired h is %lf", __FUNCTION__, min_distance, delta_h, current_h, desired_h);
 
     // If we are bumping into something we cannot go over, turn back!
-    if(lift_ > max_lift_ || lift_ < min_lift_)
+    if(lift_ > max_lift_ || lift_ < min_lift_  && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)
     {
         lift_ = current_lift_;
         sweep_ = sweep_ == min_sweep_ ? max_sweep_ : min_sweep_;
+        last_change_of_direction_ = ros::Time::now();
     }
+
+    ROS_INFO("Sweeper - %s - Lift c:%lf d:%lf Sweep c:%lf d:%lf", __FUNCTION__, current_lift_, lift_, current_sweep_, sweep_);
 
     // Step 5. Send the new command to the arm
     trajectory_msgs::JointTrajectory msg;
@@ -350,14 +414,17 @@ void Sweeper::spinOnce()
     msg.joint_names.push_back(lift_joint_);
     msg.points[0].positions.push_back(lift_);
     msg.points[0].velocities.push_back(max_lift_speed_);
-    msg.points[0].accelerations.push_back(0.8);
+    //msg.points[0].accelerations.push_back(0.0);
     msg.joint_names.push_back(sweep_joint_);
     msg.points[0].positions.push_back(sweep_);
     msg.points[0].velocities.push_back(sweep_speed_);
-    msg.points[0].accelerations.push_back(0.8);
-    msg.points[0].time_from_start = ros::Duration(10.0);
+    //msg.points[0].accelerations.push_back(0.0);
+    msg.points[0].time_from_start = ros::Duration(1.0);
 
-    joints_pub_.publish(msg);
+    if(lift_ != last_lift_ || sweep_ != last_sweep_) joints_pub_.publish(msg);
+
+    last_lift_ = lift_;
+    last_sweep_ = sweep_;
 }
 
 double Sweeper::distance(const PointT &p1, const PointT &p2)
@@ -376,7 +443,7 @@ int main(int argc, char **argv)
     ros::AsyncSpinner spinner(3);
     spinner.start();
 
-    ros::Rate r(10.0);
+    ros::Rate r(2.0);
     while(ros::ok())
     {
         sweeper.spinOnce();
