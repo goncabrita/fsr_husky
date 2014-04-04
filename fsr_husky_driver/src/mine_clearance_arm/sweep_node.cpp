@@ -41,7 +41,6 @@
 #include <actionlib/client/terminal_state.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
-#include <sensor_msgs/JointState.h>
 
 #include <tf/transform_listener.h>
 #include <tf/message_filter.h>
