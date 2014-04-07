@@ -59,12 +59,14 @@
 
 	<!-- PTU-D46 Pan and Tilt -->
 	<node name="ptu_d46_node" pkg="ptu_d46_driver" type="ptu_d46_node" output="screen" >
+		<remap from="joint_states" to="/ptu_d46_controller/joint_states"/>
 		<param name="port" value="/dev/ptu_d46" />
 		<param name="joint_state_rate" value="50.0" />
 	</node>
 
 	<!-- Mine Detection Arm -->
   	<node type="fsr_husky_arm_node" pkg="fsr_husky_driver" name="fsr_husky_arm" output="screen">
+		<remap from="joint_states" to="/arm_controller/joint_states"/>
     		<param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if00" />
     		<param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02" />
 		<param name="joint_state_rate" value="50.0" />
@@ -80,8 +82,9 @@
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
 	  <param name="publish_frequency" value="50.0" />
 	</node>
-	<node name="joint_state_publisher" pkg="fsr_husky_description" type="joint_state_publisher">
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
 	  <param name="rate" value="50.0" />
+	  <rosparam param="source_list">["/arm_controller/joint_states","/ptu_d46_controller/joint_states"]</rosparam>
 	</node>
 
 	<!--Sound Play -->

@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     joint_state.position[3] = 0.0;
     joint_state.velocity[3] = 0.0;
 
-    ros::Rate r(5.0);
+    ros::Rate r(50.0);
     while(ros::ok())
     {
         joint_state.header.stamp = ros::Time::now();
