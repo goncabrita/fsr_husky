@@ -216,10 +216,10 @@ Husky A200 file and modified by the ISR University of Coimbra
     <pointgrey_flea3 prefix="left" parent="front_husky_bridge" base_offset="0.13" camera_offset="0.05" camera_r="0" camera_p="0" camera_y="0" />
 
     <!-- PTU-D46 macro -->
-    <ptu_d46 parent="front_husky_bridge" x="0" y="-0.025" z="0" rx="0" ry="0" rz="1.5708" />
+    <ptu_d46 parent="front_husky_bridge" x="0" y="-0.025" z="0.04" rx="0" ry="0" rz="1.5708" />
 
     <!-- SICK macro -->
-    <sick_lms100 parent="ptu_d46_tilt_link" x="0.0" y="0.13" z="0.11" rx="0.0" ry="-0.7854" rz="-1.5708" />
+    <sick_lms100 parent="ptu_d46_tilt_link" x="0.0" y="0.13" z="0.11" rx="0.0" ry="-0.541053905" rz="-1.5708" />
 
     <!-- GPS macro -->
     <gps_antenna parent="back_husky_bridge" x="0" y="0.17" z="0.0" rx="0" ry="0" rz="0" />
