@@ -256,15 +256,17 @@ void FSRHuskyArm::write(double lift, double lift_speed, double sweep, double swe
 {
     if(!homing_complete_) return;
 
-    double l = lift;
+    double l = -1.0*lift;
     if(l < min_lift_) l = min_lift_;
     if(l > max_lift_) l = max_lift_;
-    int goal_l = -1.0*(l - min_lift_)*4048/(max_lift_ - min_lift_);
+    int goal_l = (l - min_lift_)*4048/(max_lift_ - min_lift_);
 
     double a = sweep;
     if(a < min_sweep_) a = min_sweep_;
     if(a > max_sweep_) a = max_sweep_;
     int goal_a = (a - min_sweep_)*max_sweep_steps_/(max_sweep_ - min_sweep_);
+
+    //ROS_INFO("FSR Husky Arm - %s - Goal lift %lf %d sweep %lf %d", __FUNCTION__, lift, goal_l, sweep, goal_a);
 
     jrk.setPosition(goal_l);
     nanotec.setPosition(goal_a);
@@ -345,7 +347,7 @@ void FSRHuskyArm::spinOnce()
     }
     //ROS_INFO("linear position:%d", linear_position);
     ros::Duration delta_t = ros::Time::now() - last_update_;
-    lift_ = -1.0*linear_position*(max_lift_ - min_lift_)/4048 + min_lift_;
+    lift_ = -1.0*(linear_position*(max_lift_ - min_lift_)/4048 + min_lift_);
     lift_speed_ = (lift_ - last_lift_)/delta_t.toSec();
 
     int rotation_position;
