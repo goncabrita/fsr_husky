@@ -77,8 +77,8 @@ private:
     //tf::MessageFilter<PointCloud> * tf_filter_;
 
     ros::Publisher roi_cloud_pub_;
-    ros::Publisher virtual_sensors_pub_;
-    ros::Publisher points_pub_;
+    //ros::Publisher virtual_sensors_pub_;
+    //ros::Publisher points_pub_;
     ros::Publisher joints_pub_;
     ros::Subscriber joints_sub_;
 
@@ -114,14 +114,9 @@ private:
 
     double height_;
 
-    double k_;
-
     double filter_box_size_;
 
     double distance(const PointT &p1, const PointT &p2);
-
-    ros::Time last_change_of_direction_;
-    ros::Duration time_between_change_of_directions_;
 };
 
 Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
@@ -168,8 +163,8 @@ Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
     tf_filter_->registerCallback( boost::bind(&Sweeper::pointCloudCallback, this, _1) );*/
 
     roi_cloud_pub_ = n.advertise<PointCloud>("roi_cloud", 1);
-    virtual_sensors_pub_ = n.advertise<geometry_msgs::PoseStamped>("virtual_sensors/pose", 10);
-    points_pub_ = n.advertise<geometry_msgs::PointStamped>("virtual_sensors/distance", 10);
+    //virtual_sensors_pub_ = n.advertise<geometry_msgs::PoseStamped>("virtual_sensors/pose", 10);
+    //points_pub_ = n.advertise<geometry_msgs::PointStamped>("virtual_sensors/distance", 10);
 
     joints_pub_ = n.advertise<trajectory_msgs::JointTrajectory>("/arm_controller/command", 10);
     joints_sub_ = n.subscribe("/arm_controller/state", 10, &Sweeper::jointsCallback, this);
@@ -177,25 +172,18 @@ Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
     pn.param<std::string>("lift_joint", lift_joint_, "upper_arm_joint");
     pn.param<std::string>("sweep_joint", sweep_joint_, "arm_axel_joint");
 
-    pn.param("min_lift", min_lift_, -0.5);
-    pn.param("max_lift", max_lift_, 0.5);
+    pn.param("min_lift", min_lift_, -0.25);
+    pn.param("max_lift", max_lift_, 0.25);
     pn.param("max_lift_speed", max_lift_speed_, 0.8);
 
-    pn.param("min_sweep", min_sweep_, -0.6);
-    pn.param("max_sweep", max_sweep_, 0.6);
+    pn.param("min_sweep", min_sweep_, -0.9);
+    pn.param("max_sweep", max_sweep_, 0.9);
     pn.param("sweep_speed", sweep_speed_, 0.8);
     pn.param("sweep_tolerance", sweep_tolerance_, 0.05);
 
     pn.param("height", height_, 0.10);
 
-    pn.param("k", k_, 1.0);
-
     pn.param("filter_box_size", filter_box_size_, 10.0);
-
-    double time_between_change_of_directions;
-    pn.param("time_between_change_of_directions", time_between_change_of_directions, 1.0);
-    time_between_change_of_directions_ = ros::Duration(time_between_change_of_directions);
-    last_change_of_direction_ = ros::Time::now();
 
     cloud_filtered_ = pcl::PointCloud<PointT>::Ptr(new pcl::PointCloud<PointT>);
 }
@@ -307,10 +295,9 @@ void Sweeper::spinOnce()
     if(!got_cloud_) return;
 
     // Step 1. Check if we should invert the sweep direction
-    if(fabs(current_sweep_ - sweep_) <= sweep_tolerance_ && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)
+    if(fabs(sweep_ - current_sweep_) <= sweep_tolerance_)
     {
-        sweep_ = sweep_ == min_sweep_ ? max_sweep_ : min_sweep_;
-        last_change_of_direction_ = ros::Time::now();
+        sweep_ = (sweep_ == min_sweep_ ? max_sweep_ : min_sweep_);
     }
 
     // Step 2. Convert the virtual sensors into the frame of the cloud
@@ -331,7 +318,7 @@ void Sweeper::spinOnce()
             return;
         }
 
-        virtual_sensors_pub_.publish(virtual_sensors[i]);
+        //virtual_sensors_pub_.publish(virtual_sensors[i]);
     }
 
     // Step 3. Find the distance to the ground of all sensors a pick the closest to the ground
@@ -396,12 +383,12 @@ void Sweeper::spinOnce()
     ROS_INFO("Sweeper - %s - Min distance to the ground is %lf, delta is %lf, current h is %lf and the desired h is %lf", __FUNCTION__, min_distance, delta_h, current_h, desired_h);
 
     // If we are bumping into something we cannot go over, turn back!
-    if(lift_ > max_lift_ || lift_ < min_lift_  && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)
+    /*if(lift_ > max_lift_ || lift_ < min_lift_  && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)
     {
         lift_ = current_lift_;
         sweep_ = sweep_ == min_sweep_ ? max_sweep_ : min_sweep_;
         last_change_of_direction_ = ros::Time::now();
-    }
+    }*/
 
     ROS_INFO("Sweeper - %s - Lift c:%lf d:%lf Sweep c:%lf d:%lf", __FUNCTION__, current_lift_, lift_, current_sweep_, sweep_);
 
