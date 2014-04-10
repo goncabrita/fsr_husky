@@ -155,7 +155,7 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     m_as_goal_.start();
     as_active_ = false;
 
-    if(!nanotec.setSpeeds(200, 400))
+    if(!nanotec.setSpeeds(200, 800))
     {
         ROS_FATAL("FSR Husky Arm - %s - Failed to set the rotation actuator speeds!", __FUNCTION__);
         ROS_BREAK();

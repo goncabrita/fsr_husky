@@ -181,7 +181,7 @@ Sweeper::Sweeper(ros::NodeHandle &n, ros::NodeHandle &pn)
     pn.param("sweep_speed", sweep_speed_, 0.8);
     pn.param("sweep_tolerance", sweep_tolerance_, 0.05);
 
-    pn.param("height", height_, 0.10);
+    pn.param("height", height_, 0.02);
 
     pn.param("filter_box_size", filter_box_size_, 10.0);
 
@@ -228,7 +228,7 @@ void Sweeper::pointCloudCallback(const PointCloud::ConstPtr& msg)
 
     pcl_conversions::fromPCL(msg->header, corners[0].header);
     corners[0].header.frame_id = base_link_frame_id_;
-    tf_.waitForTransform(msg->header.frame_id, corners[0].header.frame_id, corners[0].header.stamp, ros::Duration(0.1));
+    tf_.waitForTransform(msg->header.frame_id, corners[0].header.frame_id, corners[0].header.stamp, ros::Duration(0.2));
     for(int i=0 ; i<8 ; i++)
     {
         corners[i].header = corners[0].header;
@@ -303,7 +303,7 @@ void Sweeper::spinOnce()
     // Step 2. Convert the virtual sensors into the frame of the cloud
     std::vector<geometry_msgs::PoseStamped> virtual_sensors = virtual_sensors_;
     virtual_sensors[0].header.stamp = ros::Time::now();
-    tf_.waitForTransform(cloud_filtered_->header.frame_id, virtual_sensors[0].header.frame_id, virtual_sensors[0].header.stamp, ros::Duration(0.1));
+    tf_.waitForTransform(cloud_filtered_->header.frame_id, virtual_sensors[0].header.frame_id, virtual_sensors[0].header.stamp, ros::Duration(0.2));
     for(int i=0 ; i<virtual_sensors.size() ; i++)
     {
         virtual_sensors[i].header.stamp = virtual_sensors[0].header.stamp;
