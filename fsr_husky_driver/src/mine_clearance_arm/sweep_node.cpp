@@ -297,7 +297,8 @@ void Sweeper::spinOnce()
     // Step 1. Check if we should invert the sweep direction
     if(fabs(sweep_ - current_sweep_) <= sweep_tolerance_)
     {
-        sweep_ = (sweep_ == min_sweep_ ? max_sweep_ : min_sweep_);
+        if(sweep_  == min_sweep_) sweep_ = max_sweep_;
+        else sweep_ = min_sweep_;
     }
 
     // Step 2. Convert the virtual sensors into the frame of the cloud
@@ -373,14 +374,17 @@ void Sweeper::spinOnce()
 
     // Step 4. Determine the new lift angle based on the distance to the ground
     double min_distance = double(*std::min_element(distances.begin(), distances.end()));
-    double delta_h = height_ - min_distance;
-    double current_h = ARM_LENGTH * sin(current_lift_);
-    double desired_h = current_h + delta_h;
-    if(desired_h > ARM_LENGTH) desired_h = ARM_LENGTH;
-    else if(desired_h < -1.0*ARM_LENGTH) desired_h = -1.0*ARM_LENGTH;
-    lift_ = asin(desired_h/ARM_LENGTH);
+    if(min_distance != 2.0)
+    {
+        double delta_h = height_ - min_distance;
+        double current_h = ARM_LENGTH * sin(current_lift_);
+        double desired_h = current_h + delta_h;
+        if(desired_h > ARM_LENGTH) desired_h = ARM_LENGTH;
+        else if(desired_h < -1.0*ARM_LENGTH) desired_h = -1.0*ARM_LENGTH;
+        lift_ = asin(desired_h/ARM_LENGTH);
 
-    ROS_INFO("Sweeper - %s - Min distance to the ground is %lf, delta is %lf, current h is %lf and the desired h is %lf", __FUNCTION__, min_distance, delta_h, current_h, desired_h);
+        ROS_INFO("Sweeper - %s - Min distance to the ground is %lf, delta is %lf, current h is %lf and the desired h is %lf", __FUNCTION__, min_distance, delta_h, current_h, desired_h);
+    }
 
     // If we are bumping into something we cannot go over, turn back!
     /*if(lift_ > max_lift_ || lift_ < min_lift_  && ros::Time::now() - last_change_of_direction_ > time_between_change_of_directions_)

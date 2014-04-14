@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 2.7.0, 2014-04-07T18:05:05. -->
+<!-- Written by QtCreator 2.7.0, 2014-04-14T18:21:45. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -53,12 +53,12 @@
   <valuemap type="QVariantMap">
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop</value>
-   <value type="QByteArray" key="ProjectExplorer.ProjectConfiguration.Id">{ca3d49b9-8ae5-46c8-84d4-dcc3972015f9}</value>
+   <value type="QByteArray" key="ProjectExplorer.ProjectConfiguration.Id">{2d6f4d64-b854-41d0-aae5-beab0367958c}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
-    <value type="QString" key="CMakeProjectManager.CMakeBuildConfiguration.BuildDirectory">/home/cabrita/fsr_husky_workspace/build/fsr_husky/fsr_husky_driver</value>
+    <value type="QString" key="CMakeProjectManager.CMakeBuildConfiguration.BuildDirectory">/home/brix/fsr_husky_workspace/build/fsr_husky/fsr_husky_driver</value>
     <value type="bool" key="CMakeProjectManager.CMakeBuildConfiguration.UseNinja">false</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
@@ -453,7 +453,7 @@
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.EnvironmentId</variable>
-  <value type="QString">{434768c4-2db7-4816-b183-be720021ae65}</value>
+  <value type="QString">{59d5480b-2e15-4e9b-a3d9-af18f2710173}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>

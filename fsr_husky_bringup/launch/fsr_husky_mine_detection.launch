@@ -67,8 +67,8 @@
 	<!-- Mine Detection Arm -->
   	<node type="fsr_husky_arm_node" pkg="fsr_husky_driver" name="fsr_husky_arm" output="screen">
 		<remap from="joint_states" to="/arm_controller/joint_states"/>
-    		<param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if00" />
-    		<param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02" />
+    		<param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if00" />
+    		<param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if02" />
 		<param name="joint_state_rate" value="50.0" />
   	</node>
 

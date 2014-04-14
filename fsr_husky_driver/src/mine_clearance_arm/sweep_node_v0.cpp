@@ -38,7 +38,7 @@
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-#include <fsr_husky_driver/GotoAction.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
 
 int main(int argc, char **argv)
 {
@@ -47,15 +47,15 @@ int main(int argc, char **argv)
     ros::NodeHandle pn("~");
 
     double min;
-    pn.param("min", min, -0.45);
+    pn.param("min", min, -0.9);
     double max;
-    pn.param("max", max, 0.45);
+    pn.param("max", max, 0.9);
     double height;
-    pn.param("height", height, 0.05);
+    pn.param("height", height, -0.20);
     double speed;
     pn.param("speed", speed, 0.2);
 
-    actionlib::SimpleActionClient<fsr_husky_driver::GotoAction> ac("fsr_husky_arm/goto", true);
+    actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> ac("/arm_controller/follow_joint_trajectory", true);
     ROS_INFO("Sweep -- Waiting for the action server to start...");
     ac.waitForServer();
     ROS_INFO("Sweep -- Got it!");
@@ -64,17 +64,29 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {
-        fsr_husky_driver::GotoGoal goal;
-        goal.joint.header.stamp = ros::Time::now();
-        goal.joint.name.resize(2);
-        goal.joint.position.resize(2);
-        goal.joint.velocity.resize(2);
-        goal.joint.name[0] = "arm_linear_joint";
-        goal.joint.position[0] = height;
-        goal.joint.velocity[0] = 0.0;
-        goal.joint.name[1] = "arm_rotation_joint";
-        goal.joint.position[1] = position = position == min ? max : min;
-        goal.joint.velocity[1] = speed;
+        control_msgs::FollowJointTrajectoryGoal goal;
+        goal.trajectory.header.stamp = ros::Time::now();
+        goal.trajectory.points.resize(1);
+        goal.trajectory.joint_names.push_back("upper_arm_joint");
+        goal.trajectory.points[0].positions.push_back(height);
+        goal.trajectory.points[0].velocities.push_back(0.0);
+        goal.trajectory.joint_names.push_back("arm_axel_joint");
+        goal.trajectory.points[0].positions.push_back(position = position == min ? max : min);
+        goal.trajectory.points[0].velocities.push_back(speed);
+
+        goal.path_tolerance.resize(2);
+        goal.path_tolerance[0].name = "upper_arm_joint";
+        goal.path_tolerance[0].position = -1;
+        goal.path_tolerance[1].name = "arm_axel_joint";
+        goal.path_tolerance[1].position = -1;
+
+        goal.goal_tolerance.resize(2);
+        goal.goal_tolerance[0].name = "upper_arm_joint";
+        goal.goal_tolerance[0].position = 0.05;
+        goal.goal_tolerance[1].name = "arm_axel_joint";
+        goal.goal_tolerance[1].position = 0.05;
+
+        goal.goal_time_tolerance = ros::Duration(30.0);
 
         ac.sendGoal(goal);
 

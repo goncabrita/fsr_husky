@@ -77,6 +77,8 @@ class FSRHuskyArm
         int max_sweep_steps_;
 
         double joint_state_rate_;
+
+        bool got_new_goal_;
 };
 
 FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
@@ -93,18 +95,19 @@ FSRHuskyArm::FSRHuskyArm(ros::NodeHandle &nh) :
     m_joint_state_pub_ = nh.advertise<sensor_msgs::JointState>("/joint_states", 200);
 
     homing_complete_ = false;
+    got_new_goal_ = false;
 }
 
 void FSRHuskyArm::init(ros::NodeHandle &pnh)
 {
     // Query for serial configuration
     std::string linear_port;
-    pnh.param<std::string>("linear_actuator_port", linear_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if00");
+    pnh.param<std::string>("linear_actuator_port", linear_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if00");
     int linear_baudrate;
     pnh.param("linear_actuator_baudrate", linear_baudrate, 115200);
 
     std::string rotation_port;
-    pnh.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00042539-if02");
+    pnh.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if02");
     int rotation_baudrate;
     pnh.param("rotation_actuator_baudrate", rotation_baudrate, 115200);
 
@@ -155,7 +158,7 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
     m_as_goal_.start();
     as_active_ = false;
 
-    if(!nanotec.setSpeeds(200, 800))
+    if(!nanotec.setSpeeds(200, 400))
     {
         ROS_FATAL("FSR Husky Arm - %s - Failed to set the rotation actuator speeds!", __FUNCTION__);
         ROS_BREAK();
@@ -165,6 +168,8 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
 bool FSRHuskyArm::home(double timeout)
 {
     ROS_INFO("FSR Husky Arm - %s - Starting homing...", __FUNCTION__);
+
+    jrk.setPosition(4048/2);
 
     if(!nanotec.setDirection(NANOTEC_LEFT))
     {
@@ -247,6 +252,11 @@ bool FSRHuskyArm::home(double timeout)
     }
 
     ROS_INFO("FSR Husky Arm - %s - Homing complete!", __FUNCTION__);
+
+    if(!nanotec.setSpeeds(200, 800))
+    {
+        ROS_WARN("FSR Husky Arm - %s - Failed to set the rotation actuator speeds!", __FUNCTION__);
+    }
 
     homing_complete_ = true;
     return true;
@@ -392,6 +402,12 @@ void FSRHuskyArm::spinOnce()
     // If there is stuff on the queue deal with it
     if(trajectory_.size() > 0)
     {
+        if(got_new_goal_)
+        {
+            write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+            got_new_goal_ = false;
+        }
+
         double lift_tolerance = lift_tolerance_;
         double sweep_tolerance = sweep_tolerance_;
         ros::Duration time_tolerance = time_tolerance_;
@@ -443,7 +459,7 @@ void FSRHuskyArm::spinOnce()
         }
         else if(ros::Time::now() > start_time_ + time_tolerance)
         {
-            if(as_active_ && goal_tolerance_[lift_index_].position != -1 && goal_tolerance_[sweep_index_].position != -1)
+            if(as_active_ && path_tolerance_[lift_index_].position != -1 && path_tolerance_[sweep_index_].position != -1)
             {
                 trajectory_.clear();
 
@@ -479,8 +495,8 @@ void FSRHuskyArm::setGoal(const trajectory_msgs::JointTrajectory::ConstPtr& msg)
     {
         trajectory_.push_back(msg->points[i]);
     }
-
-    write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+    got_new_goal_ = true;
+    //write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
 }
 
 void FSRHuskyArm::actionServerCallback(const control_msgs::FollowJointTrajectoryGoalConstPtr &goal)
@@ -523,7 +539,8 @@ void FSRHuskyArm::actionServerCallback(const control_msgs::FollowJointTrajectory
     path_tolerance_ = goal->path_tolerance;
     goal_tolerance_ = goal->goal_tolerance;
     goal_time_tolerance_ = goal->goal_time_tolerance;
-    write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
+    got_new_goal_ = true;
+    //write(trajectory_.front().positions[lift_index_], trajectory_.front().velocities[lift_index_], trajectory_.front().positions[sweep_index_], trajectory_.front().velocities[sweep_index_]);
 
     goal_start_time_ = ros::Time::now();
 
