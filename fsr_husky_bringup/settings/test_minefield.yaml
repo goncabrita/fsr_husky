@@ -1,0 +1,21 @@
+minefield:
+
+  corner1:
+    latitude: 40.184674743
+    longitude: -8.41437622
+    altitude: 102.2409
+    
+  corner2:
+    latitude: 40.184685143
+    longitude: -8.414522932
+    altitude: 95.9852
+    
+  corner3:
+    latitude: 40.184777498
+    longitude: -8.414532388
+    altitude: 97.18
+    
+  corner4:
+    latitude: 40.184759868
+    longitude: -8.414378174
+    altitude: 100.9421

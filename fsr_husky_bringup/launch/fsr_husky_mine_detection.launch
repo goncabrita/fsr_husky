@@ -8,6 +8,7 @@
 	<!-- RTK GPS -->
 	<node name="rtk_robot_node" pkg="rtk_ros" type="rtk_robot_node" >
 		<param name="port" value="gps" />
+		<param name="gps_frame_id" value="/world" />
 	</node>
 
 	<!-- XSens MTi-300 IMU -->
@@ -18,12 +19,12 @@
 	</node>
 
 	<!-- PointGrey Flea3 GigE Cameras -->
-	<group ns="stereo" if="$(arg use_cameras)">
-		<node name="left" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
+	<group if="$(arg use_cameras)">
+		<node name="left_camera" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node">
 			<param name="ip_address" value="192.168.4.11" />
 			<param name="frame_id" value="left_camera" />
 		</node>
-		<node name="right" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node" >
+		<node name="right_camera" pkg="pgr_gige_camera_driver" type="pgr_gige_camera_node" >
 			<param name="ip_address" value="192.168.4.12" />
 			<param name="frame_id" value="right_camera" />
 		</node>
@@ -41,7 +42,12 @@
     		<param name="vo_used" value="false"/>
     		<param name="debug" value="false"/>
     		<param name="self_diagnose" value="false"/>
-  	</node>
+	</node>
+	
+	<!-- Unscented Kalman Filter -  Estimate the 3D global pose of the robot -->
+	<node name="graft_ukf_absolute" pkg="graft" type="graft_ukf_absolute" output="screen" >
+	  <rosparam file="$(find fsr_husky_bringup)/settings/global_localization.yaml" command="load" />
+	</node>
 
 	<!-- SICK LMS100 Laser Range Finder -->
 	<node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" >
@@ -96,8 +102,7 @@
 		<param name="multiplex" value="true"/>
 		<param name="scale_angular" value="1.5"/>
 		<param name="scale_linear" value="0.5"/>
-		<param name="control_pan_and_tilt" value="true"/>
-		<remap from="ptu_d46/cmd" to="cmd"/>
+		<param name="control_pan_and_tilt" value="false"/>
 	</node>
 
 </launch>
