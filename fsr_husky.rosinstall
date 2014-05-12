@@ -19,13 +19,19 @@
     local-name: cereal_port
     version: master
 
-
 # RTK GPS
 
 - git:
     uri: http://ubuntu-fsr.isr.uc.pt/husky/rtk_gps.git
     local-name: rtk_gps
     version: master
+    
+# Clearpath's robot_pose_ekf
+
+- git:
+    uri: https://github.com/brNX/navigation.git
+    local-name: robot_pose_ekf_cp
+    version: robot_pose_ekf
 
 
 # Hardware drivers for sensors and actuators
