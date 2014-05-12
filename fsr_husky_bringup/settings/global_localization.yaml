@@ -1,9 +1,9 @@
 filter_type: UKF # EKF or UKF - may change to be different nodes instead of a parameter
 
-planar_output: false # Output only x, y, and rotation about z
+planar_output: true # Output only x, y, and rotation about z
 
 parent_frame_id: world # TF frame id, override output_frame if set
-child_frame_id: odom #TF frame id
+child_frame_id: base_footprint #TF frame id
 
 update_rate: 10.0 #Overides 'freq' if set, in Hz
 #update_topic: odom # Which topic to trigger updates, if blank, uses timed update_rate, if '*', will trigger on all new topics
@@ -37,9 +37,9 @@ topics: {
 
     # Row major 6x6: x, y, z, rotation about x, rotation about y, rotation about z
     # Read from message if all zero
-    override_pose_covariance: [1, 0, 0, 0, 0, 0,
-                               0, 1, 0, 0, 0, 0,
-                               0, 0, 4, 0, 0, 0,
+    override_pose_covariance: [0.01, 0, 0, 0, 0, 0,
+                               0, 0.01, 0, 0, 0, 0,
+                               0, 0, 500, 0, 0, 0,
                                0, 0, 0, 1e10, 0, 0,
                                0, 0, 0, 0, 1e10, 0,
                                0, 0, 0, 0, 0, 1e10],
@@ -55,7 +55,7 @@ topics: {
   },
 
   base_odometry: {
-    topic: /odom,
+    topic: /encoder,
     type: nav_msgs/Odometry,
     absolute_pose: False,
     delta_pose: True, # Overrides absolute_pose
