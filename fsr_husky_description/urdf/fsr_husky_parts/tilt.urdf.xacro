@@ -117,7 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		-->
   
 		<link name="ptu_d46_tilt_link">
-    			<visual>
+    			<!--<visual>
       				<origin xyz="0 0 0" rpy="0 0 0" />
       				<geometry>
 					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_tilt_link.stl" />
@@ -129,13 +129,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       				<geometry>
 					<mesh filename="package://fsr_husky_description/models/fsr_husky_parts/ptu_d46_tilt_link.stl" />
       				</geometry>
-    			</collision>
-  		</link>
-		<gazebo reference="ptu_d46_tilt_link">
-        		<material>Gazebo/FlatBlack</material>
-        		<turnGravityOff>false</turnGravityOff>
-    		</gazebo>
-  
+		  </collision> -->
+  		</link> 
 		<joint name="ptu_d46_tilt_joint" type="revolute">
     			<origin xyz="0 0 0.17274" rpy="0 0 1.57" />
     			<parent link="ptu_d46_base_link" />
