@@ -37,7 +37,6 @@
   <build_depend>laser_assembler</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <build_depend>ptu_d46_driver</build_depend>
   <build_depend>angles</build_depend>
   <build_depend>cereal_port</build_depend>
   <build_depend>actionlib</build_depend>
@@ -55,7 +54,6 @@
   <run_depend>laser_assembler</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>ptu_d46_driver</run_depend>
   <run_depend>angles</run_depend>
   <run_depend>cereal_port</run_depend>
   <run_depend>actionlib</run_depend>

@@ -4,7 +4,7 @@ project(fsr_husky_driver)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs ptu_d46_driver actionlib actionlib_msgs control_msgs moveit_core moveit_ros_planning_interface moveit_ros_perception hardware_interface controller_manager pcl_ros)
+find_package(catkin REQUIRED COMPONENTS laser_assembler roscpp angles cereal_port sensor_msgs actionlib actionlib_msgs control_msgs moveit_core moveit_ros_planning_interface moveit_ros_perception hardware_interface controller_manager pcl_ros)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
@@ -81,7 +81,7 @@ include_directories(
 
 ## Declare a cpp executable
 add_executable(cloud_assembler_node src/pointcloud_generator/cloud_assembler.cpp)
-add_executable(cloud_assembler_node_v0 src/pointcloud_generator/cloud_assembler_v0.cpp)
+#add_executable(cloud_assembler_node_v0 src/pointcloud_generator/cloud_assembler_v0.cpp)
 add_executable(fsr_husky_arm_node src/mine_clearance_arm/fsr_husky_arm_node.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
 add_executable(fsr_husky_arm_node_v0 src/mine_clearance_arm/fsr_husky_arm_node_v0.cc src/mine_clearance_arm/jrk_driver.cc src/mine_clearance_arm/nanotec_driver.cc)
 add_executable(home_node src/mine_clearance_arm/home_node.cpp)
@@ -93,7 +93,7 @@ add_executable(sweep_arm_node_v0 src/mine_clearance_arm/sweep_node_v0.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(cloud_assembler_node ${catkin_LIBRARIES})
-target_link_libraries(cloud_assembler_node_v0 ${catkin_LIBRARIES})
+#target_link_libraries(cloud_assembler_node_v0 ${catkin_LIBRARIES})
 target_link_libraries(fsr_husky_arm_node ${catkin_LIBRARIES} cereal_port)
 target_link_libraries(fsr_husky_arm_node_v0 ${catkin_LIBRARIES} cereal_port)
 target_link_libraries(home_node ${catkin_LIBRARIES})
@@ -101,7 +101,7 @@ target_link_libraries(sweep_arm_node ${catkin_LIBRARIES})
 target_link_libraries(sweep_arm_node_v0 ${catkin_LIBRARIES})
 
 add_dependencies(cloud_assembler_node ${catkin_EXPORTED_TARGETS})
-add_dependencies(cloud_assembler_node_v0 ${catkin_EXPORTED_TARGETS})
+#add_dependencies(cloud_assembler_node_v0 ${catkin_EXPORTED_TARGETS})
 add_dependencies(fsr_husky_arm_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(fsr_husky_arm_node_v0 ${catkin_EXPORTED_TARGETS})
 

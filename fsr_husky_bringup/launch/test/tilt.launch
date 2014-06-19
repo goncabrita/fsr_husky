@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<launch>
+  
+  
+ <!-- SICK LMS100 Laser Range Finder
+ <node name="lms1xx_node" pkg="lms1xx_driver" type="lms1xx_node" output="screen">
+   <param name="host" value="192.168.4.13" />
+   <param name="frame_id" value="sick_lms100" />
+ </node>
+ 
+ <!-- Convert laser scan to pointclouds 
+ <node pkg="laser_filters" type="scan_to_cloud_filter_chain" output="screen" name="scan_to_cloud_filter_chain_tilt_laser">
+   <remap from="scan" to="scan"/>
+   <remap from="cloud_filtered" to="tilt_scan_cloud"/>
+   <param name="target_frame" type="string" value="base_link"/>
+ </node>-->
+ 
+ <!-- dynamixel tilt -->
+ 
+    <node name="dynamixel_manager" pkg="dynamixel_controllers" type="controller_manager.py" required="true" output="screen">
+        <rosparam>
+            namespace: dxl_manager
+            serial_ports:
+                ptu_d46_port:
+                    port_name: "/dev/tilt"
+                    baud_rate: 1000000
+                    min_motor_id: 1
+                    max_motor_id: 25
+                    update_rate: 50
+        </rosparam>
+    </node>
+ 
+ <!-- Start tilt joint controller -->
+ <rosparam file="$(find fsr_husky_driver)/settings/tilt.yaml" command="load"/>
+ 
+ <node name="tilt_controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
+       args="--manager=dxl_manager
+       --port ptu_d46_port
+       ptu_d46_tilt_controller"
+       output="screen">
+ </node>
+  
+ <!-- Start the Dynamixel Joint States Publisher -->
+ <node name="dynamixel_joint_states_publisher" pkg="fsr_husky_description" type="dynamixel_joint_state_publisher.py" output="screen"> 
+   <remap from="joint_states" to="/ptu_d46_controller/joint_states"/>
+ </node>
+  
+ 
+ <!-- FSR Husky URDF -->
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky_mine_detection.urdf.xacro'" />
+ <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+   <param name="publish_frequency" value="50.0" />
+ </node>
+ <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+   <param name="rate" value="50.0" />
+   <rosparam param="source_list">["/ptu_d46_controller/joint_states"]</rosparam>
+ </node>
+ 
+ </launch>
+ 
