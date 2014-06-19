@@ -8,7 +8,7 @@
    <param name="frame_id" value="sick_lms100" />
  </node>
  
- <!-- Convert laser scan to pointclouds 
+ Convert laser scan to pointclouds 
  <node pkg="laser_filters" type="scan_to_cloud_filter_chain" output="screen" name="scan_to_cloud_filter_chain_tilt_laser">
    <remap from="scan" to="scan"/>
    <remap from="cloud_filtered" to="tilt_scan_cloud"/>

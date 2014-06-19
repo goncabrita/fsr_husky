@@ -135,7 +135,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     			<origin xyz="0 0 0.17274" rpy="0 0 1.57" />
     			<parent link="ptu_d46_base_link" />
     			<child link="ptu_d46_tilt_link" />
-    			<axis xyz="0 1 0" />
+    			<axis xyz="0 -1 0" />
     			<limit effort="6.0" lower="-1.5" upper="1.5" velocity="1.17" />
 			<dynamics damping="0.008" friction="0.6" />
   		</joint>
