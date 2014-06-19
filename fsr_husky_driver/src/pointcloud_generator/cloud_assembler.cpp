@@ -38,10 +38,12 @@
 
 #include <ros/ros.h>
 #include <laser_assembler/AssembleScans2.h>
-#include <actionlib/client/simple_action_client.h>
+
+/*#include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>*/
 #include <sensor_msgs/PointCloud2.h>
+#include <std_msgs/Float64.h>
 
 int main(int argc, char **argv)
 {
@@ -50,120 +52,78 @@ int main(int argc, char **argv)
     ros::NodeHandle pn("~");
 
     double tilt_speed;
-    pn.param("tilt_speed", tilt_speed, 0.8);
+    pn.param("tilt_speed", tilt_speed, 1.17);
 
     double lower_tilt;
-    pn.param("lower_tilt", lower_tilt, -0.4);
+    pn.param("lower_tilt", lower_tilt, -0.6);
 
     double upper_tilt;
-    pn.param("upper_tilt", upper_tilt, 0.5);
+    pn.param("upper_tilt", upper_tilt, 0.0);
 
     double timeout;
     pn.param("timeout", timeout, 10.0);
 
-    actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> tilt_ac("/ptu_d46_controller/follow_joint_trajectory", true);
-    ROS_INFO("PointCloud Generator -- Waiting for tilt action server to start...");
-    tilt_ac.waitForServer();
-    ROS_INFO("PointCloud Generator -- Got it!");
+    //actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> tilt_ac("/ptu_controller/follow_joint_trajectory", true);
+    //ROS_INFO("PointCloud Generator -- Waiting for tilt action server to start...");
+    //tilt_ac.waitForServer();
+    /*ROS_INFO("PointCloud Generator -- Got it!");
+    ros::topic::waitForMessage*/
+
+
 
     ROS_INFO("PointCloud Generator -- Waiting for laser assembler service to start...");
     ros::service::waitForService("assemble_scans2");
     ROS_INFO("PointCloud Generator -- Got it!");
+
     ros::ServiceClient client = n.serviceClient<laser_assembler::AssembleScans2>("assemble_scans2");
     laser_assembler::AssembleScans2 assembler_srv;
+
+    ros::Publisher tilt_sub = n.advertise<std_msgs::Float64>("ptu_d46_tilt_controller/command", 1);
 
     ros::Publisher cloud_pub = n.advertise<sensor_msgs::PointCloud2>("cloud", 1);
 
     // Move laser to the start position
     double tilt = upper_tilt;
 
-    control_msgs::FollowJointTrajectoryGoal goal;
+    /*control_msgs::FollowJointTrajectoryGoal goal;
     goal.trajectory.header.stamp = ros::Time::now();
-    goal.trajectory.joint_names.resize(2);
+    goal.trajectory.joint_names.resize(1);
     goal.trajectory.points.resize(1);
-    goal.trajectory.joint_names[0] = "ptu_d46_pan_joint";
-    goal.trajectory.points[0].positions.push_back(0.0);
-    goal.trajectory.points[0].velocities.push_back(0.0);
-    goal.trajectory.points[0].accelerations.push_back(0.0);
-    goal.trajectory.points[0].effort.push_back(0.0);
-    goal.trajectory.joint_names[1] = "ptu_d46_tilt_joint";
+    goal.trajectory.joint_names[0] = "ptu_d46_tilt_joint";
     goal.trajectory.points[0].positions.push_back(tilt);
     goal.trajectory.points[0].velocities.push_back(tilt_speed);
     goal.trajectory.points[0].accelerations.push_back(0.5);
     goal.trajectory.points[0].effort.push_back(0.0);
     goal.trajectory.points[0].time_from_start = ros::Duration(2.0);
-    goal.path_tolerance.resize(2);
-    goal.path_tolerance[0].name = "ptu_d46_pan_joint";
+    goal.path_tolerance.resize(1);
+    goal.path_tolerance[0].name = "ptu_d46_tilt_joint";
     goal.path_tolerance[0].position = -1;
-    goal.path_tolerance[1].name = "ptu_d46_tilt_joint";
-    goal.path_tolerance[1].position = -1;
-    goal.goal_tolerance.resize(2);
-    goal.goal_tolerance[0].name = "ptu_d46_pan_joint";
+
+    goal.goal_tolerance.resize(1);
+    goal.goal_tolerance[0].name = "ptu_d46_tilt_joint";
     goal.goal_tolerance[0].position = 0.01;
-    goal.goal_tolerance[1].name = "ptu_d46_tilt_joint";
-    goal.goal_tolerance[1].position = 0.01;
+
     goal.goal_time_tolerance = ros::Duration(2.0);
 
-    tilt_ac.sendGoal(goal);
+    tilt_ac.sendGoal(goal);*/
 
-    // Wait for the action to return
-    bool finished_before_timeout = tilt_ac.waitForResult(ros::Duration(timeout));
 
-    if(!finished_before_timeout)
-    {
-        ROS_FATAL("PointCloud Generator -- Unable to move the laser to the start position!");
-        ROS_BREAK();
-    }
+    std_msgs::Float64 pos;
+    pos.data=0.0;
+
+    tilt_sub.publish(pos);
+
+
+    ros::Duration(2.0).sleep();
 
     while(ros::ok())
     {
         assembler_srv.request.begin = ros::Time::now();
 
-        control_msgs::FollowJointTrajectoryGoal goal;
-        goal.trajectory.header.stamp = ros::Time::now();
-        goal.trajectory.joint_names.resize(2);
-        goal.trajectory.points.resize(1);
-        goal.trajectory.joint_names[0] = "ptu_d46_pan_joint";
-        goal.trajectory.points[0].positions.push_back(0.0);
-        goal.trajectory.points[0].velocities.push_back(0.0);
-        goal.trajectory.joint_names[1] = "ptu_d46_tilt_joint";
-        goal.trajectory.points[0].positions.push_back(tilt = tilt == upper_tilt ? lower_tilt : upper_tilt);
-        goal.trajectory.points[0].velocities.push_back(tilt_speed);
-        goal.trajectory.points[0].time_from_start = ros::Duration(2.0);
-        goal.path_tolerance.resize(2);
-        goal.path_tolerance[0].name = "ptu_d46_pan_joint";
-        goal.path_tolerance[0].position = -1;
-        goal.path_tolerance[1].name = "ptu_d46_tilt_joint";
-        goal.path_tolerance[1].position = -1;
-        goal.goal_tolerance.resize(2);
-        goal.goal_tolerance[0].name = "ptu_d46_pan_joint";
-        goal.goal_tolerance[0].position = 0.01;
-        goal.goal_tolerance[1].name = "ptu_d46_tilt_joint";
-        goal.goal_tolerance[1].position = 0.01;
-        goal.goal_time_tolerance = ros::Duration(2.0);
+        pos.data = (tilt = (tilt == upper_tilt) ? lower_tilt : upper_tilt);
+        tilt_sub.publish(pos);
 
-        tilt_ac.sendGoal(goal);
-
-        // Wait for the action to return
-        bool finished_before_timeout = tilt_ac.waitForResult(ros::Duration(timeout));
-
-        if(finished_before_timeout)
-        {
-            assembler_srv.request.end = ros::Time::now();
-
-            if(client.call(assembler_srv))
-            {
-                cloud_pub.publish(assembler_srv.response.cloud);
-            }
-            else
-            {
-                ROS_WARN("PointCloud Generator - Service call failed!");
-            }
-        }
-        else
-        {
-            ROS_WARN("PointCloud Generator - ActionServer timeout!");
-        }
+        ros::Duration(1.0).sleep();
     }
 
     return 0;

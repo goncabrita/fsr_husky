@@ -39,7 +39,8 @@
        ptu_d46_tilt_controller"
        output="screen">
  </node>
-  
+ 
+
  <!-- Start the Dynamixel Joint States Publisher -->
  <node name="dynamixel_joint_states_publisher" pkg="fsr_husky_description" type="dynamixel_joint_state_publisher.py" output="screen"> 
    <remap from="joint_states" to="/ptu_d46_controller/joint_states"/>

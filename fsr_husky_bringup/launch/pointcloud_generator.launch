@@ -19,8 +19,8 @@
 
 	<!-- Step 4. PointCloud Generator - Tilts the laser and generates PointClouds -->
   	<node type="cloud_assembler_node" pkg="fsr_husky_driver" name="pointcloud_generator" output="screen">
-	    <param name="lower_tilt" value="-0.5" />
-	    <param name="upper_tilt" value="0.5" />
+	    <param name="lower_tilt" value="-0.7" />
+	    <param name="upper_tilt" value="0.0" />
 	    <param name="tilt_speed" value="0.8" />
 	</node>
 
