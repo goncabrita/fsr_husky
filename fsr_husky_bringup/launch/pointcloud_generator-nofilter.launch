@@ -9,7 +9,7 @@
 	
 	<!-- Step 3. Assemble pointcloud into a full world view -->
 	<node pkg="laser_assembler" type="point_cloud2_assembler" output="screen"  name="point_cloud_assembler">
-	    <remap from="cloud" to="/move_group/tilt_scan_cloud_filtered"/>
+	    <remap from="cloud" to="/tilt_scan_cloud"/>
              <!-- <remap from="cloud" to="/tilt_scan_cloud"/> -->
 	    <param name="tf_cache_time_secs" type="double" value="10.0" />
 	    <param name="tf_tolerance_secs" type="double" value="0.01" />
@@ -21,8 +21,8 @@
 	<!-- Step 4. PointCloud Generator - Tilts the laser and generates PointClouds -->
   	<node type="cloud_assembler_node" pkg="fsr_husky_driver" name="pointcloud_generator" output="screen">
 	    <param name="lower_tilt" value="-0.7" />
-	    <param name="upper_tilt" value="0.0" />
-	    <param name="tilt_speed" value="0.8" />
+	    <param name="upper_tilt" value="-0.1" />
+	    <param name="tilt_speed" value="0.5" />
 	</node>
 
 </launch>

@@ -123,7 +123,23 @@ int main(int argc, char **argv)
         pos.data = (tilt = (tilt == upper_tilt) ? lower_tilt : upper_tilt);
         tilt_sub.publish(pos);
 
-        ros::Duration(1.0).sleep();
+        ros::Duration(0.5).sleep();
+
+        pos.data = (tilt = (tilt == upper_tilt) ? lower_tilt : upper_tilt);
+        tilt_sub.publish(pos);
+
+        ros::Duration(0.5).sleep();
+
+         assembler_srv.request.end = ros::Time::now();
+
+         if(client.call(assembler_srv))
+            {
+                cloud_pub.publish(assembler_srv.response.cloud);
+            }
+            else
+            {
+                ROS_WARN("PointCloud Generator - Service call failed!");
+            }
     }
 
     return 0;

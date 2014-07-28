@@ -1,6 +1,7 @@
 <launch>
 
-	<arg name="arm_is_installed" default="false" />
+        <arg name="arm_is_installed" default="false" />
+	<arg name="fsr_husky_mine_detection_arm_is_mounted" default="false" />
 
 	<arg name="cmd_vel_topic" default="cmd_vel" />
 	<arg name="odom_topic" default="odom" />
@@ -12,7 +13,7 @@
 		<rosparam file="$(find fsr_husky_bringup)/settings/navigation_simple/global_costmap_params.yaml" command="load" />
 		<rosparam file="$(find husky_navigation)/config/base_local_planner_params.yaml" command="load" />
 		
-		<rosparam file="$(find husky_navigation)/config/base_local_planner_params.yaml" command="load" if="$(param fsr_husky_mine_detection_arm_is_mounted)" />
+		<rosparam file="$(find husky_navigation)/config/base_local_planner_params.yaml" command="load" if="$(arg fsr_husky_mine_detection_arm_is_mounted)" />
 
 		<remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
    		<remap from="odom" to="$(arg odom_topic)"/>

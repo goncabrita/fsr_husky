@@ -217,7 +217,7 @@ Husky A200 file and modified by the ISR University of Coimbra
 
     <!-- PTU-D46 macro -->
     <!--<ptu_d46 parent="front_husky_bridge" x="0" y="-0.025" z="0.04" rx="0" ry="0" rz="1.5708" />-->
-    <ptu_d46 parent="front_husky_bridge" x="0.05" y="0.0" z="-0.004" rx="0" ry="0" rz="-1.5708" />
+    <ptu_d46 parent="front_husky_bridge" x="0.05" y="0.0" z="-0.004" rx="0" ry="0" rz="-1.5533467075" />
 
     <!-- SICK macro -->
     <sick_lms100 parent="ptu_d46_tilt_link" x="0.01242" y="0.0" z="0.06360" rx="0.0" ry="0" rz="0" />

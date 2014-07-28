@@ -4,7 +4,7 @@
 
   <node pkg="fsr_husky_teleop" type="joystick_teleop_node" name="fsr_husky_xbox360">
     <param name="scale_angular" value="1.5"/>
-    <param name="scale_linear" value="0.5"/>
+    <param name="scale_linear" value="1.2"/>
     <remap from="teleop/cmd_vel" to="/husky/cmd_vel"/>
   </node>
 

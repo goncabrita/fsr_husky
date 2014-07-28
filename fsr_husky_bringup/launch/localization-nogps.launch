@@ -2,12 +2,12 @@
 <launch>
 <!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
 
-<node name="gps_conv" pkg="gps_common" type="utm_odometry_node">
+<!--<node name="gps_conv" pkg="gps_common" type="utm_odometry_node">
   <remap from="odom" to="gps/odom"/>
   <remap from="fix" to="gps/fix" />
   <param name="rot_covariance" value="99999" />
   <param name="frame_id" value="gps_antenna" />
-</node>
+</node> -->
 
 
 
@@ -22,7 +22,7 @@
     	<param name="imu_used" value="true"/>
 	<param name="imu_absolute" value="true"/>
     	<param name="vo_used" value="false"/>
-	<param name="gps_used" value="true"/>
+	<param name="gps_used" value="false"/>
     	<param name="debug" value="false"/>
     	<param name="self_diagnose" value="false"/>
 </node>

@@ -13,11 +13,11 @@
 <!-- Clearpath Husky Robot -->
  <include file="$(find husky_base)/launch/base.launch" /> 
  
- <!-- RTK GPS -->
+ <!-- RTK GPS 
  <node name="rtk_robot_node" pkg="rtk_ros" type="rtk_robot_node" >
    <param name="port" value="gps" />
    <param name="gps_frame_id" value="gps_antenna" />
- </node>
+ </node> -->
  
  <!-- XSens MTi-300 IMU -->
  <node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
@@ -38,7 +38,7 @@
    </node>
  </group>
  
- 
+  <!--
  <node name="gps_conv" pkg="gps_common" type="utm_odometry_node">
    <remap from="odom" to="gps/odom"/>
    <remap from="fix" to="gps/fix" />
@@ -60,7 +60,7 @@
    <param name="gps_used" value="true"/>
    <param name="debug" value="false"/>
    <param name="self_diagnose" value="false"/>
- </node>
+ </node> -->
  
  
  <!-- SICK LMS100 Laser Range Finder -->
@@ -111,8 +111,8 @@
  <!-- Mine Detection Arm -->
  <node type="fsr_husky_arm_node" pkg="fsr_husky_driver" name="fsr_husky_arm" output="screen">
    <remap from="joint_states" to="/arm_controller/joint_states"/>
-   <param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if00" />
-   <param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if02" />
+   <param name="linear_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00076021-if00" />
+   <param name="rotation_actuator_port" type="string" value="/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00076021-if02" />
    <param name="joint_state_rate" value="50.0" />
  </node>
  
