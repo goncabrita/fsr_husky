@@ -74,6 +74,7 @@
    <remap from="scan" to="scan"/>
    <remap from="cloud_filtered" to="tilt_scan_cloud"/>
    <param name="target_frame" type="string" value="base_link"/>
+   <param name="high_fidelity" value="true" />
    <!--<rosparam command="load" file="$(find fsr_husky_bringup)/settings/shadow_filter.yaml" /> -->
  </node>-->
  
@@ -88,7 +89,7 @@
                     baud_rate: 1000000
                     min_motor_id: 1
                     max_motor_id: 25
-                    update_rate: 50
+                    update_rate: 100
         </rosparam>
     </node>
  
@@ -105,6 +106,7 @@
  <!-- Start the Dynamixel Joint States Publisher -->
  <node name="dynamixel_joint_states_publisher" pkg="fsr_husky_description" type="dynamixel_joint_state_publisher.py" output="screen"> 
    <remap from="joint_states" to="/ptu_d46_controller/joint_states"/>
+   <param name="rate" value="100.0" />
  </node>
   
  
@@ -124,10 +126,10 @@
  <!-- FSR Husky URDF -->
  <param name="robot_description" command="$(find xacro)/xacro.py '$(find fsr_husky_description)/urdf/fsr_husky_mine_detection.urdf.xacro'" />
  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
-   <param name="publish_frequency" value="50.0" />
+   <param name="publish_frequency" value="100.0" />
  </node>
  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-   <param name="rate" value="50.0" />
+   <param name="rate" value="100.0" />
    <rosparam param="source_list">["/arm_controller/joint_states","/ptu_d46_controller/joint_states"]</rosparam>
  </node>
  

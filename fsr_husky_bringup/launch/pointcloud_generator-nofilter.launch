@@ -13,16 +13,17 @@
              <!-- <remap from="cloud" to="/tilt_scan_cloud"/> -->
 	    <param name="tf_cache_time_secs" type="double" value="10.0" />
 	    <param name="tf_tolerance_secs" type="double" value="0.01" />
-	    <param name="max_clouds" type="int" value="400" />
+	    <param name="max_clouds" type="int" value="2000" />
 	    <param name="ignore_laser_skew" type="bool" value="true" />
 	    <param name="fixed_frame" type="string" value="base_link" />
 	</node>
 
 	<!-- Step 4. PointCloud Generator - Tilts the laser and generates PointClouds -->
   	<node type="cloud_assembler_node" pkg="fsr_husky_driver" name="pointcloud_generator" output="screen">
-	    <param name="lower_tilt" value="-0.7" />
-	    <param name="upper_tilt" value="-0.1" />
-	    <param name="tilt_speed" value="0.5" />
+	    <param name="lower_tilt" value="-0.8" />
+	    <param name="upper_tilt" value="-0.2" />
+	     <!--<param name="tilt_speed" value="0.5" /> -->
+             <param name="sleep_interval" value="1.0"/>            
 	</node>
 
 </launch>

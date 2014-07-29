@@ -7,11 +7,11 @@
 	<arg name="odom_topic" default="odom" />
 
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-		<rosparam file="$(find husky_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-		<rosparam file="$(find husky_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-		<rosparam file="$(find fsr_husky_bringup)/settings/navigation_simple/local_costmap_params.yaml" command="load" />
-		<rosparam file="$(find fsr_husky_bringup)/settings/navigation_simple/global_costmap_params.yaml" command="load" />
-		<rosparam file="$(find husky_navigation)/config/base_local_planner_params.yaml" command="load" />
+		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
+		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/base_local_planner_params.yaml" command="load" />
 		
 		<rosparam file="$(find husky_navigation)/config/base_local_planner_params.yaml" command="load" if="$(arg fsr_husky_mine_detection_arm_is_mounted)" />
 

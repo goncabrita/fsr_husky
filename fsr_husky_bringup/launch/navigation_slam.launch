@@ -1,12 +1,14 @@
 <launch>
 
 	<arg name="arm_is_installed" default="false" />
+       	<arg name="cmd_vel_topic" default="cmd_vel" />
+	<arg name="odom_topic" default="odom" />
 
 	<!-- GMapping -->
-	<include file="$(find husky_navigation)/launch/gmapping.launch.xml"/>
+	<include file="$(find husky_navigation)/launch/gmapping.launch"/>
 
 	<!-- Move Base -->
-	<include file="$(find fsr_husky_bringup)/launch/includes/move_base.launch.xml">
+	<include file="$(find fsr_husky_bringup)/launch/includes/move_base.launch">
 		<arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
     		<arg name="odom_topic" value="$(arg odom_topic)"/>
 	</include>

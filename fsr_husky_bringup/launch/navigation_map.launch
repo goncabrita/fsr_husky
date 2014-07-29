@@ -21,7 +21,7 @@
   	</include>
 
 	<!-- Move Base -->
-	<include file="$(find fsr_husky_bringup)/launch/includes/move_base.launch.xml">
+	<include file="$(find fsr_husky_bringup)/launch/includes/move_base.launch">
 		<arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
     		<arg name="odom_topic" value="$(arg odom_topic)"/>
 	</include>

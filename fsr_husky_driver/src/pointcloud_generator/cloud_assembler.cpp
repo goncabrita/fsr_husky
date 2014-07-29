@@ -63,6 +63,9 @@ int main(int argc, char **argv)
     double timeout;
     pn.param("timeout", timeout, 10.0);
 
+   double sleeptime;
+   pn.param("sleep_interval",sleeptime,0.5);
+
     //actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> tilt_ac("/ptu_controller/follow_joint_trajectory", true);
     //ROS_INFO("PointCloud Generator -- Waiting for tilt action server to start...");
     //tilt_ac.waitForServer();
@@ -123,12 +126,7 @@ int main(int argc, char **argv)
         pos.data = (tilt = (tilt == upper_tilt) ? lower_tilt : upper_tilt);
         tilt_sub.publish(pos);
 
-        ros::Duration(0.5).sleep();
-
-        pos.data = (tilt = (tilt == upper_tilt) ? lower_tilt : upper_tilt);
-        tilt_sub.publish(pos);
-
-        ros::Duration(0.5).sleep();
+        ros::Duration(sleeptime).sleep();
 
          assembler_srv.request.end = ros::Time::now();
 
