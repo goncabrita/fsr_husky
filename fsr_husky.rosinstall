@@ -7,7 +7,7 @@
 # The FSR Husky ROS packages
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/fsr_husky.git
+    uri: https://github.com/goncabrita/fsr_husky.git
     local-name: fsr_husky
     version: master
 
@@ -15,16 +15,16 @@
 # CerealPort
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/roomba/cereal_port.git
+    uri: https://github.com/goncabrita/cereal_port.git
     local-name: cereal_port
     version: master
 
 # RTK GPS
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/rtk_gps.git
-    local-name: rtk_gps
-    version: master
+    uri: https://github.com/brNX/rtklibros.git
+    local-name: rtklibros
+    version: hydro-devel
     
 # Clearpath's robot_pose_ekf
 
@@ -37,32 +37,27 @@
 # Hardware drivers for sensors and actuators
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/lms1xx_driver.git
+    uri: https://github.com/goncabrita/lms1xx_driver.git
     local-name: lms1xx_driver
     version: master
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/xsens_driver.git
+    uri: https://github.com/ethz-asl/ethzasl_xsens_driver.git
     local-name: xsens_driver
     version: master
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/pgr_gige_camera_driver.git
+    uri: https://github.com/goncabrita/pgr_gige_camera_driver.git
     local-name: pgr_gige_camera_driver
     version: master
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/ptu_d46_driver.git
-    local-name: ptu_d46_driver
-    version: master
-
-- git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/metal_detector_sensor_msgs.git
+    uri: https://github.com/goncabrita/metal_detector_msgs.git
     local-name: metal_detector_sensor_msgs
     version: master
 
 - git:
-    uri: http://ubuntu-fsr.isr.uc.pt/husky/vallon_vmp3_driver.git
+    uri: https://github.com/goncabrita/vallon_vmp3_driver.git
     local-name: vallon_vmp3_driver
     version: master
 
