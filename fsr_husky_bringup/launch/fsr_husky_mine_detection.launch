@@ -20,7 +20,7 @@
  </node> -->
  
  <!-- XSens MTi-300 IMU -->
- <node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" >
+ <node name="xsens_mti_300" pkg="xsens_driver" type="mtnode.py" output="screen" >
    <param name="device" value="/dev/mti_300" />
    <param name="baudrate" value="115200" />
    <param name="frame_id" value="base_imu" />
@@ -80,7 +80,7 @@
  
  <!-- dynamixel tilt -->
  
-    <node name="dynamixel_manager" pkg="dynamixel_controllers" type="controller_manager.py" required="true" output="screen">
+    <node name="dynamixel_manager" pkg="dynamixel_controllers" type="controller_manager.py" output="screen">
         <rosparam>
             namespace: dxl_manager
             serial_ports:
@@ -103,10 +103,10 @@
        output="screen">
  </node>
   
- <!-- Start the Dynamixel Joint States Publisher -->
- <node name="dynamixel_joint_states_publisher" pkg="fsr_husky_description" type="dynamixel_joint_state_publisher.py" output="screen"> 
+ <!-- Start the Tilt Joint States Publisher -->
+ <node name="tilt_joint_state_publisher" pkg="fsr_husky_description" type="tilt_joint_state_publisher" output="screen"> 
    <remap from="joint_states" to="/ptu_d46_controller/joint_states"/>
-   <param name="rate" value="100.0" />
+   <param name="joint_topic" value="/ptu_d46_tilt_controller/state" />
  </node>
   
  

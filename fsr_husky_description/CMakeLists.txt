@@ -4,7 +4,7 @@ project(fsr_husky_description)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp sensor_msgs)
+find_package(catkin REQUIRED roscpp sensor_msgs dynamixel_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -70,6 +70,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 ## Declare a cpp executable
 # add_executable(fsr_husky_description_node src/fsr_husky_description_node.cpp)
 add_executable(joint_state_publisher src/joint_state_publisher.cpp)
+add_executable(tilt_joint_state_publisher src/tilt_joint_state_publisher.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -77,6 +78,10 @@ add_executable(joint_state_publisher src/joint_state_publisher.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(joint_state_publisher
+   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(tilt_joint_state_publisher
    ${catkin_LIBRARIES}
 )
 
