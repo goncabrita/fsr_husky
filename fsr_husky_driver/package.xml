@@ -50,7 +50,8 @@
   <build_depend>controller_manager</build_depend>
   <build_depend>pcl_ros</build_depend>
   <build_depend>dynamixel_motor</build_depend>
-  
+  <build_depend>nanotec_driver</build_depend>
+
   <run_depend>laser_assembler</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
@@ -67,6 +68,7 @@
   <run_depend>controller_manager</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>dynamixel_motor</run_depend>
+  <run_depend>nanotec_driver</run_depend>
   
   <!-- The export tag contains other, unspecified, tags -->
   <export>
