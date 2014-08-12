@@ -10,7 +10,7 @@ project(fsr_husky_data_viewer)
 set(metal_detector_msgs_DIR "/home/xpecttrum/ROSDevelopStacks/metal_detector_drivers/metal_detector_msgs")
 
 find_package(catkin REQUIRED COMPONENTS
-  eigen
+  cmake_modules
   roscpp_serialization
   geometry_msgs
   message_filters
