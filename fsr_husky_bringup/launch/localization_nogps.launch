@@ -2,15 +2,6 @@
 <launch>
 <!-- Extended Kalman Filter -  Estimate the 3D pose of the robot -->
 
-<!--<node name="gps_conv" pkg="gps_common" type="utm_odometry_node">
-  <remap from="odom" to="gps/odom"/>
-  <remap from="fix" to="gps/fix" />
-  <param name="rot_covariance" value="99999" />
-  <param name="frame_id" value="gps_antenna" />
-</node> -->
-
-
-
 <node pkg="robot_pose_ekf_cp" type="robot_pose_ekf_cp" name="robot_pose_ekf_cp" output="screen">
 	<remap from="odom" to="encoder"/>
 	<remap from="imu_data" to="imu/data"/>

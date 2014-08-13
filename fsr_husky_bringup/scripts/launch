@@ -1,13 +1,13 @@
 #!/bin/bash
 
-source /opt/ros/hydro/setup.bash
+source /opt/ros/indigo/setup.bash
 source /home/${USER}/fsr_husky_workspace/devel/setup.bash
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 screen -dmS roscore ${SCRIPTPATH}/roscore.sh
 
-sleep 60
+sleep 30
 
 # Launch the robot with the mine detection sensor suit
 if [ -e /dev/mti_300 -a -e /dev/gps -a -e /dev/prolific -a -e /dev/ptu_d46 -a -e /dev/input/js0 -a -e /dev/metal_detector ]

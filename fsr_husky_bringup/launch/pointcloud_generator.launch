@@ -1,12 +1,11 @@
-
 <?xml version="1.0"?>
 <launch>
 
 	<!-- Step 1. Convert tilt laser scan to pointcloud -->
 	<!-- On the fsr_husky*.launch files -->
 	
-	<!-- Step 2. MoveIt will take care of self-filtering -->
-	<!-- On the move_group.launch file -->
+	<!-- Step 2. robot_self_filter will take care of self-filtering -->
+	<include file="$(find robot_self_filter)/launch/self_filter.launch"/>
 	
 	<!-- Step 3. Assemble pointcloud into a full world view -->
 	<node pkg="laser_assembler" type="point_cloud2_assembler" output="screen"  name="point_cloud_assembler">
