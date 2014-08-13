@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 
     ros::Publisher tilt_sub = n.advertise<std_msgs::Float64>("ptu_d46_tilt_controller/command", 1);
 
-    ros::Publisher cloud_pub = n.advertise<sensor_msgs::PointCloud2>("cloud", 1);
+    ros::Publisher cloud_pub = n.advertise<sensor_msgs::PointCloud2>("assembled_cloud", 1);
 
     // Move laser to the start position
     double tilt = upper_tilt;
