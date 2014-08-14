@@ -26,7 +26,7 @@
  
 
 <!-- localization without GPS -->
-<include file="localization_nogps.launch"/> 
+<include file="$(find fsr_husky_bringup)/launch/localization_nogps.launch"/> 
 
  <!-- dynamixel tilt -->
  
@@ -76,9 +76,9 @@
  </node>-->
 
 <!-- assemble pointcloud -->
-<include file="pointcloud_generator_nofilter.launch"/>
+<include file="$(find fsr_husky_bringup)/launch/pointcloud_generator_nofilter.launch"/>
 
-<!-- filter pointcloud to remove grass ans small plants -->
+<!-- filter pointcloud to remove grass and small plants -->
 <node pkg="pcl_sandbox" type="pcl_sandbox" name="pcl_filter">
     <param name="min_neighbors" value="12"/>
     <param name="radius" value="0.10"/>
