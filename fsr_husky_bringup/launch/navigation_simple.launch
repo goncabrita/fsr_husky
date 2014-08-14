@@ -6,7 +6,7 @@
 	<arg name="cmd_vel_topic" default="cmd_vel" />
 	<arg name="odom_topic" default="odom" />
 
-	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+	<node pkg="move_base" type="move_base" respawn="false" clear_params="true"  name="move_base" output="screen">
 		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find fsr_husky_bringup)/settings/navigation/local_costmap_params.yaml" command="load" />
