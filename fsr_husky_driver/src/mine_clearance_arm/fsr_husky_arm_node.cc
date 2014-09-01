@@ -108,12 +108,12 @@ void FSRHuskyArm::init(ros::NodeHandle &pnh)
 {
     // Query for serial configuration
     std::string linear_port;
-    pnh.param<std::string>("linear_actuator_port", linear_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if00");
+    pnh.param<std::string>("linear_actuator_port", linear_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00076021-if00");
     int linear_baudrate;
     pnh.param("linear_actuator_baudrate", linear_baudrate, 115200);
 
     std::string rotation_port;
-    pnh.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00054105-if02");
+    pnh.param<std::string>("rotation_actuator_port", rotation_port, "/dev/serial/by-id/usb-Pololu_Corporation_Pololu_Jrk_21v3_Motor_Controller_00076021-if02");
     int rotation_baudrate;
     pnh.param("rotation_actuator_baudrate", rotation_baudrate, 115200);
 
@@ -212,8 +212,7 @@ bool FSRHuskyArm::home(double timeout)
     try{ motor.getStatus(motor_status); }
     catch(nanotec::Exception& e)
     {
-        ROS_ERROR("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
-        return false;
+        ROS_WARN("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
     }
     while(!motor_status.zero_position_reached && ros::Time::now() - start_time < ros::Duration(timeout) && ros::ok())
     {
@@ -221,8 +220,7 @@ bool FSRHuskyArm::home(double timeout)
         try{ motor.getStatus(motor_status);}
         catch(nanotec::Exception& e)
         {
-            ROS_ERROR("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
-            return false;
+            ROS_WARN("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
         }
     }
     if(!motor_status.zero_position_reached)
@@ -239,13 +237,42 @@ bool FSRHuskyArm::home(double timeout)
         ROS_ERROR("FSR Husky Arm - %s - Failed to switch to absolute position mode!", __FUNCTION__);
         return false;
     }
-
     try{ motor.setTravelDistance(5000); }
     catch(nanotec::Exception& e)
     {
         ROS_ERROR("FSR Husky Arm - %s - Failed to set the possition to search for the other limit switch!", __FUNCTION__);
         return false;
     }
+    try{ motor.startMotor(); }
+    catch(nanotec::Exception& e)
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to set the possition to search for the other limit switch!", __FUNCTION__);
+        return false;
+    }
+
+    start_time = ros::Time::now();
+    try{ motor.getStatus(motor_status);}
+    catch(nanotec::Exception& e)
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
+        return false;
+    }
+    while(!motor_status.controller_ready && ros::Time::now() - start_time < ros::Duration(timeout) && ros::ok())
+    {
+        r.sleep();
+        try{ motor.getStatus(motor_status);}
+        catch(nanotec::Exception& e)
+        {
+            ROS_ERROR("FSR Husky Arm - %s - Failed to get motor status!", __FUNCTION__);
+            return false;
+        }
+    }
+    if(!motor_status.controller_ready)
+    {
+        ROS_ERROR("FSR Husky Arm - %s - Timeout before the arm was ready to move!", __FUNCTION__);
+        return false;
+    }
+
     try{ motor.startMotor(); }
     catch(nanotec::Exception& e)
     {
@@ -683,7 +710,7 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     ros::NodeHandle pn("~");
 
-    ROS_INFO("FSR Husky Arm -- ROS Hardware Driver");
+    ROS_INFO("FSR Husky Arm v2.0 -- ROS Hardware Driver");
 
     FSRHuskyArm arm(n);
     arm.init(pn);
