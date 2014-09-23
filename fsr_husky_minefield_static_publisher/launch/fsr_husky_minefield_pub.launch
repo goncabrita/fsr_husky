@@ -1,0 +1,6 @@
+<launch>
+	<!-- The minefield frame -->
+	<node pkg="fsr_husky_minefield_static_publisher" type="fsr_husky_minefield_static_publisher_node" respawn="false" name="minefield_publisher" output="screen">
+	<rosparam file="$(find fsr_husky_minefield_static_publisher)/settings/minefield.yaml" command="load"/>
+	</node>
+</launch>

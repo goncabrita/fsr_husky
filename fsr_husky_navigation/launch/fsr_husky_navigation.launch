@@ -1,0 +1,17 @@
+<launch>
+	<!-- The minefield frame -->
+<!--	<include file="$(find fsr_husky_minefield_static_publisher)/launch/fsr_husky_minefield_pub.launch"/> -->
+
+	<!-- The navigation simple -->
+<!--	<include file="$(find fsr_husky_bringup)/launch/navigation_simple.launch"/> -->
+
+	<!-- The navigation dynamic reconfigure frame -->
+	<node pkg="fsr_husky_navigation" type="fsr_husky_dynamic_reconfigure_node" respawn="false" name="fsr_husky_dynamic_reconfigure" output="screen">
+	   <param name="max_sweep_vel_" value="0.25" />
+	   <param name="max_vel_" value="0.5" />
+	</node>
+
+	<!-- The navigation frame -->
+	<node pkg="fsr_husky_navigation" type="fsr_husky_navigation_node" respawn="false" name="fsr_husky_navigation" output="screen">
+	</node>
+</launch>

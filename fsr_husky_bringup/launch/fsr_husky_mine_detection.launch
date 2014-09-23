@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="use_cameras" default="false"/>
+  <arg name="use_sweep_speed_control" default="true"/>
   
 <!-- Clearpath Husky Robot -->
  <include file="$(find husky_base)/launch/base.launch" /> 
@@ -110,10 +111,17 @@
  
  <node pkg="fsr_husky_teleop" type="joystick_teleop_node" name="full_teleop" output="screen">
    <param name="multiplex" value="true"/>
-   <param name="scale_angular" value="1.5"/>
-   <param name="scale_linear" value="1.0"/>
    <param name="control_pan_and_tilt" value="false"/>
+   <!-- Without sweep speed control -->
+   <param name="scale_angular" value="1.5" unless="$(arg use_sweep_speed_control)" />
+   <param name="scale_linear" value="1.0" unless="$(arg use_sweep_speed_control)" />
+   <!-- With sweep speed control -->
+   <param name="scale_angular" value="1.0" if="$(arg use_sweep_speed_control)" />
+   <param name="scale_linear" value="0.25" if="$(arg use_sweep_speed_control)" />
  </node>
+ 
+ <param name="set_sweep_speed_control" value="true" if="$(arg use_sweep_speed_control)" />
+ <param name="set_sweep_speed_control" value="false" unless="$(arg use_sweep_speed_control)" />
  
  </launch>
  

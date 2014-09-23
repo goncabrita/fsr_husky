@@ -1,3 +1,41 @@
+/*********************************************************************
+*
+* Software License Agreement (BSD License)
+*
+*  Copyright (c) 2014, ISR University of Coimbra.
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions
+*  are met:
+*
+*   * Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*   * Redistributions in binary form must reproduce the above
+*     copyright notice, this list of conditions and the following
+*     disclaimer in the documentation and/or other materials provided
+*     with the distribution.
+*   * Neither the name of the ISR University of Coimbra nor the names of its
+*     contributors may be used to endorse or promote products derived
+*     from this software without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+*  POSSIBILITY OF SUCH DAMAGE.
+*
+* Author: Jose Prado on 14/08/2014
+* Updated: Baptiste Gil on 26/08/2014
+*********************************************************************/
+
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
@@ -6,9 +44,9 @@
 #include <tf/transform_listener.h>
 #include <tf/message_filter.h>
 #include <message_filters/sync_policies/approximate_time.h>
-#include <boost/signals.hpp>
-#include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
+//#include <boost/signals.hpp>
+//#include <boost/bind.hpp>
+//#include <boost/mem_fn.hpp>
 #include <geometry_msgs/PointStamped.h>
 #include <metal_detector_msgs/Coil.h>
 #include <visualization_msgs/Marker.h>
@@ -29,7 +67,7 @@ using namespace metal_detector_msgs;
 #define MY_RTI_RESOLUTION 0.05 //diminuir este numero fica mais refinado (em metros)
 #define MY_RTI_UPDATE_FREQUENCY 5 //5Hz
 #define X_OFFSET 0 //para evitar indices negativos na matrix do RTI
-#define Y_OFFSET 0 
+#define Y_OFFSET 0
 #define MY_RAW_ESCALA 1000.0
 #define MY_RTI_CELL_SIZE 1
 
@@ -42,7 +80,7 @@ using namespace metal_detector_msgs;
 #define MY_RTI_RESOLUTION 0.03 //diminuir este numero fica mais refinado (em metros)
 #define MY_RTI_UPDATE_FREQUENCY 5 //5Hz
 #define X_OFFSET 0 //para evitar indices negativos na matrix do RTI
-#define Y_OFFSET 0 
+#define Y_OFFSET 0
 #define MY_RAW_ESCALA 10000.0
 #define MY_RTI_CELL_SIZE 10
 */
@@ -57,11 +95,18 @@ using namespace metal_detector_msgs;
 map_data	interpolacao(0, 0, MY_RTI_CELL_SIZE, MY_RTI_CELL_SIZE, MY_RTI_RESOLUTION, MY_RTI_RESOLUTION);
 map_data    error_interp(0, 0, MY_RTI_CELL_SIZE, MY_RTI_CELL_SIZE, MY_RTI_RESOLUTION, MY_RTI_RESOLUTION);*/
 
+//*** GLOBAIS *****
 // --- For rviz
 ros::Publisher marker_pub;
 visualization_msgs::Marker mapa_plot, marker, points, line_strip, line_list;
-		
 ros::Publisher pcl_raw_pub;
+//GEO POINTS
+ros::Publisher pontos_prado_pub;
+int tank_mine_limiar, personal_mine_limiar;
+bool flag_sweep = false;
+
+
+//*****************
 
 class MetalDetector
 {
@@ -72,50 +117,82 @@ public:
         tf_filter_ = new tf::MessageFilter<metal_detector_msgs::Coil>(md_sub_, tf_, target_frame_, 10);
         tf_filter_->registerCallback( boost::bind(&MetalDetector::msgCallback, this, _1) );
         pub_ = n_.advertise<geometry_msgs::PointStamped>("coil_position", 10);
-        
+
         //inicializacao das variaveis
-     	qtd_pontos = 0;
-		last_X = 0;
-		last_Y = 0;
-		last_Z = 0;
-		inicio = 1;
+        qtd_pontos = 0;
+        last_X = 0;
+        last_Y = 0;
+        last_Z = 0;
+        inicio = 1;
+
+        coil_buffer[0] = 0;
+        coil_buffer[1] = 0;
+        coil_buffer[2] = 0;
+        coil_buffer[3] = 0;
+        coil_buffer[4] = 0;
+        coil_buffer[5] = 0;
+        coil_buffer[6] = 0;
+        coil_buffer[7] = 0;
+        coil_buffer[8] = 0;
+        coil_buffer[9] = 0;
+        buffer_index=0;
+
+        number_of_heter=0;
+        number_of_mines=0;
+        flag_detected = false;
+        flag2_detected = false;
+        nao_detections=0;
+
+
+
 
     }
-    
+
     private:
+    //buffer coil
+    int coil_buffer[10];
+    int buffer_index;
+    int number_of_heter;
+    int number_of_mines;
+    bool flag_detected;
+    bool flag2_detected;
+    int nao_detections;
+
+
+
     message_filters::Subscriber<metal_detector_msgs::Coil> md_sub_;
     tf::TransformListener tf_;
     tf::MessageFilter<metal_detector_msgs::Coil> * tf_filter_;
     ros::NodeHandle n_;
     std::string target_frame_;
     ros::Publisher pub_;
-    ros::Publisher * pontos_joao_ptr;//APAGAR DEPOIS
-	// --- p Kriging
-	//point3d robot;
-	//list<point3d> buffer;
-	long int qtd_pontos;
-	char filename[30];
-	//----
-	float last_X, last_Y, last_Z;
-	int inicio;
 
-	// - Rainbow Color Transformation ---
-	typedef struct {
-		double r;       // percent
-		double g;       // percent
-		double b;       // percent
-	} rgb;
+    // --- p Kriging
+    //point3d robot;
+    //list<point3d> buffer;
+    long int qtd_pontos;
+    char filename[30];
+    //----
+    float last_X, last_Y, last_Z;
+    int inicio;
 
-	typedef struct {
-		double h;       // angle in degrees
-		double s;       // percent
-		double v;       // percent
-	} hsv;
+    // - Rainbow Color Transformation ---
+    typedef struct {
+        double r;       // percent
+        double g;       // percent
+        double b;       // percent
+    } rgb;
+
+    typedef struct {
+        double h;       // angle in degrees
+        double s;       // percent
+        double v;       // percent
+    } hsv;
 
 //METHODS
 
 
-
+/*
 rgb hsv2rgb(hsv in)
 {
     double      hh, p, q, t, ff;
@@ -180,8 +257,9 @@ rgb hsv2rgb(hsv in)
     }
     return out;
 }
+*/
 
-
+/*
 //This function receives a value in any range defined by max and min values, and create a color object when min is blue and max is red
 std_msgs::ColorRGBA RangeValue_to_RainbowColor(int * my_hue, long int maxvalue, long int minvalue, long int CoilM_C0){
 
@@ -209,34 +287,34 @@ std_msgs::ColorRGBA RangeValue_to_RainbowColor(int * my_hue, long int maxvalue, 
 
     return c2;
 }
+*/
 
 sensor_msgs::PointCloud cloud_msg;
+geometry_msgs::Point32 ponto;
 
 void publish_pcl_raw(float X,float Y, float Z, ros::Publisher *pub_ptr)
 {
-	
-	geometry_msgs::Point32 ponto;
 
-	ponto.x = X;
-	ponto.y = Y;
-	ponto.z = Z;
+    ponto.x = X;
+    ponto.y = Y;
+    ponto.z = Z;
 
-	cloud_msg.points.push_back(ponto);
-	
-	cloud_msg.header.stamp = ros::Time::now();
-	cloud_msg.header.frame_id = "/minefield";
+    cloud_msg.points.push_back(ponto);
 
-	pub_ptr->publish(cloud_msg);
+    cloud_msg.header.stamp = ros::Time::now();
+    cloud_msg.header.frame_id = "/minefield";
+
+    pub_ptr->publish(cloud_msg);
 }
-	
-void publishRvizMarker(float X,float Y, float Z, std_msgs::ColorRGBA corPonto){
-	
-	
-	geometry_msgs::Point p;
-	geometry_msgs::Point p2;
 
-	
-	
+void publishRvizMarker(float X,float Y, float Z, std_msgs::ColorRGBA corPonto){
+
+
+    geometry_msgs::Point p;
+    geometry_msgs::Point p2;
+
+
+
    //---------RVIZ Marker publication---------------
     //turn Global --- visualization_msgs::Marker marker, line_strip, line_list;
     // Set the frame ID and timestamp.  See the TF tutorials for information on these.
@@ -313,7 +391,7 @@ void publishRvizMarker(float X,float Y, float Z, std_msgs::ColorRGBA corPonto){
     //--- line list is red
     line_list.color.r = 1.0;
     line_list.color.a = 1.0;
-    
+
 // %EndTag(COLOR)%
 
 // %Tag(LIFETIME)%
@@ -321,24 +399,24 @@ void publishRvizMarker(float X,float Y, float Z, std_msgs::ColorRGBA corPonto){
 
 
 // %EndTag(LIFETIME)%
-	
-	
-	p.x = X;
-	p.y = Y;
-	p.z = Z;
-
-	p2.x = X;
-	p2.y = Y;
-	p2.z = 0;
 
 
-	line_strip.points.push_back(p);
+    p.x = X;
+    p.y = Y;
+    p.z = Z;
 
-	points.points.push_back(p2);
-	points.colors.push_back(corPonto);
+    p2.x = X;
+    p2.y = Y;
+    p2.z = 0;
 
 
-	// Publish the marker
+    line_strip.points.push_back(p);
+
+    points.points.push_back(p2);
+    points.colors.push_back(corPonto);
+
+
+    // Publish the marker
     fprintf(stderr,"\npublish marker\n");
     //marker_pub.publish(line_strip);
     //marker_pub.publish(line_list);
@@ -346,19 +424,9 @@ void publishRvizMarker(float X,float Y, float Z, std_msgs::ColorRGBA corPonto){
 
 }
 
-
-/*float lastLX = 0;
-float lastLY = 0;
-float L_inicio = 1;
-float lastRX = 0;
-float lastRY = 0;
-float R_inicio = 1;
-float stop_left = 0;
-float stop_right = 0;
-*/
-
- void msgCallback(const boost::shared_ptr<const metal_detector_msgs::Coil>& coil_ptr)
-    {
+void msgCallback(const boost::shared_ptr<const metal_detector_msgs::Coil>& coil_ptr)
+{
+    if(flag_sweep){
         geometry_msgs::PointStamped point_in;
         point_in.header.frame_id = coil_ptr->header.frame_id;
         point_in.header.stamp = coil_ptr->header.stamp;
@@ -374,7 +442,7 @@ float stop_right = 0;
             tf_.transformPoint(target_frame_, point_in, point_out);
 
             // Note that z is the position of the coil, not the position of the possible metal sample!
-             ROS_INFO("Coil %s with data ch0 %d ch1 %d ch2 %d at x %f y %f z %f",
+            /* ROS_INFO("Coil %s with data ch0 %d ch1 %d ch2 %d at x %f y %f z %f",
                 coil_ptr->header.frame_id.c_str(),
                 coil_ptr->channel[0],
                 coil_ptr->channel[1],
@@ -382,64 +450,112 @@ float stop_right = 0;
                 point_out.point.x,
                 point_out.point.y,
                 point_out.point.z);
+*/
+            point_out.header.frame_id = coil_ptr->header.frame_id;
+            point_out.header.stamp = coil_ptr->header.stamp;
 
-             point_out.header.frame_id = coil_ptr->header.frame_id;
-             point_out.header.stamp = coil_ptr->header.stamp;
+            //***DETECCAO DE HETEROGENEIDADES ** minas ******************
+            //buffer para deteccao de heterogeneidades
+            if(buffer_index < 9){//encher o buffer
+                coil_buffer[buffer_index] = coil_ptr->channel[0];
+                buffer_index++;
+            }
+            if(buffer_index >= 9){//buffer cheio
+                //mover o buffer para tras
+                for(int i=0;i<9;i++){
+                    coil_buffer[i] = coil_buffer[i+1];
+                }
+                coil_buffer[buffer_index] = coil_ptr->channel[0];//coloca o novo valor na ultima posicao
+            }
 
-	//point_out tem a posicao
-	//coil_ptr->channel[0]
-            
-	long int minvalue = 0; 
-    long int maxvalue = 1;
+            //print do buffer
+            //fprintf(stderr,"\nBuffer = %d %d %d %d %d %d %d %d %d %d",coil_buffer[0],coil_buffer[1],coil_buffer[2],coil_buffer[3],coil_buffer[4],coil_buffer[5],coil_buffer[6],coil_buffer[7],coil_buffer[8],coil_buffer[9]);
 
-	float mapX; //para evitar indices negativos na matriz
-	float mapY;
+            //buffer cheio *****************
+            if(buffer_index >= 9){//so analisa depois do buffer cheio
 
-	std_msgs::ColorRGBA corPonto;
-	
-	//fprintf(stderr,"\nX=%lf,Y=%lf,Z=%lf\n",MD_position->point.x,MD_position->point.y,MD_position->point.z);
-
-			fprintf(stderr,"%d",coil_ptr->channel[0]);
-
-			    // --- preparando o arco-iris ---
-                     
-                        //if(coil_ptr->zero[0]==0){
-                               //long int minvalue = -1930000; //fixando zero como 2 milhoes (para este dataset), assim tenho apenas valores positivos (o certo é pegar o menor valor de todo o scan para ser o zero)
-                            minvalue = -300000; //fixando zero como 2 milhoes (para este dataset), assim tenho apenas valores positivos (o certo é pegar o menor valor de todo o scan para ser o zero)
-                            maxvalue =  -150000;
-                        //}else{
-                        //    minvalue = coil_ptr->zero[0];
-                        //    maxvalue = -150000;
-                        //}
-                        
-                        int my_hue=0; //vai ser modificado pela função a seguir para conter o valor da coil, normalizado entre 0 e 240
+                //Analisar desvio padrao do buffer
+                int  media, desviopadrao;
+                int j, tam;
+                tam=10;
+                /* Calcula a media do vetor */
+                for(media=0.0, j=0; j<=(tam-1); j++)
+                    media += coil_buffer[j];
+                media /= (float) tam;
+                /* Calcula o desviopadrao do vetor */
+                for(desviopadrao=0.0, j=0; j<=(tam-1); j++)
+                    //variancia += (coil_buffer[j]-media)*(coil_buffer[j]-media);
+                    desviopadrao += abs(coil_buffer[j]-media);
+                desviopadrao /= (float) tam;
+                /* Mostra os resultados na tela */
+                // printf(" Media = %d \n", media);
+                //printf(" DP= %d", desviopadrao);
 
 
-                        corPonto = RangeValue_to_RainbowColor(&my_hue,maxvalue,minvalue,coil_ptr->channel[0]);
-                        
-                      
-                        //-------------------------------
+                std_msgs::ColorRGBA c2;
+                c2.r = 255;
+                c2.g = 0;
+                c2.b = 0;
+                c2.a = 1.0;
 
-			//Interpolacao dos dados
+                //diminuir este valor de 30000 para aumentar a sensibilidade (tambem aumenta os falsos positivos)
+                if(desviopadrao > personal_mine_limiar && desviopadrao < tank_mine_limiar){
+                    if(!flag_detected){
+                        fprintf(stderr,"\nANTI-PERSONAL MINE DETECTED ! n_het=%d dp=%d \n",++number_of_heter,desviopadrao);
+                        flag_detected = true;
+                        nao_detections = 0;
+                        point_out.point.z = 1;//anti-personal
+                        //todo guardar posicoes das heterogeneidades em um buffer de pontos
+                        publishRvizMarker(point_out.point.x,   point_out.point.y,   0,   c2);
+                        pontos_prado_pub.publish(point_out.point);
 
-		     mapX = point_out.point.x + X_OFFSET; //para evitar indices negativos na matriz
-			 mapY = point_out.point.y + Y_OFFSET;
+                    }
+                }else
+                    if(desviopadrao >= tank_mine_limiar){
+                        if(!flag2_detected){
+                            fprintf(stderr,"\nANTI-TANK MINE DETECTED ! n_het=%d dp=%d \n",++number_of_heter,desviopadrao);
+                            flag2_detected = true;
+                            nao_detections = 0;
+                            point_out.point.z = 2;//anti-tank
+                            publishRvizMarker(point_out.point.x,   point_out.point.y,   0,   c2);
+                            pontos_prado_pub.publish(point_out.point);
 
-//		    //guardar pontos -- krigering
-//            //MD
-//            if(qtd_pontos%6==0){ //reduzir os pontos fornecidos por 3 para o rti ir mais longe sem encravar
-//				mapa_local.set_robot_position(mapX, mapY);
-//				mapa_local.insert_robot_sample(mapX, mapY, (coil_ptr->channel[0]/MY_RAW_ESCALA) );
-//			}
-//            qtd_pontos++;
-//			//end -- krigering
+                        }
+                    }else{
+                        flag_detected = false;
+                        flag2_detected = false;
+                        nao_detections++;
+                    }
 
-			publish_pcl_raw(point_out.point.x,   point_out.point.y,   (coil_ptr->channel[0]/MY_RAW_ESCALA), &pcl_raw_pub);
-			
-			//publishRvizMarker(point_out.point.x,   point_out.point.y,   (coil_ptr->channel[0]/MY_RAW_ESCALA),   corPonto);
-   
+                // *** juntar as heterogeneidades em possiveis minas
+                //nao_detections aqui vai ter a ver com o espaço esperado entre cada mina
+                if(nao_detections > 250 && number_of_heter > 2){ //pelo menos tres detections
+                    number_of_mines++;
 
-            // pub_.publish( point_out ); 
+                    //fprintf(stderr,"\nhora de juntar uma mina = %d",number_of_mines);
+
+                    //todo
+                    // media das posicoes de todas as heterogeneidades encontradas até agora
+                    //depois apagar as heter do buffer de heterogeneidades
+
+                    nao_detections = 0;
+                    number_of_heter=0;
+
+                }
+
+            }//fim if buffer cheio
+
+            //*********************************************************************
+
+
+
+
+            publish_pcl_raw(point_out.point.x,   point_out.point.y,   (coil_ptr->channel[1]/MY_RAW_ESCALA), &pcl_raw_pub);
+
+            //publishRvizMarker(point_out.point.x,   point_out.point.y,   (coil_ptr->channel[0]/MY_RAW_ESCALA),   corPonto);
+
+
+            // pub_.publish( point_out );
 
         }
         catch (tf::TransformException &ex)
@@ -447,9 +563,25 @@ float stop_right = 0;
             ROS_WARN("Failure %s\n", ex.what());
         }
     }
-
+}
 
 }; //fim da classe metal detector
+
+
+void flag_msgCallback(const std_msgs::String& msg)
+{
+  if(msg.data == "start")
+  {
+      ROS_INFO("Sweep initiated: acquiring data from the metal detector");
+      flag_sweep=true;
+  }
+  else if(msg.data == "stop")
+  {
+       ROS_INFO("Sweep paused: ignoring data from the metal detector");
+       flag_sweep=false;
+  }
+
+}
 
  int main(int argc, char **argv)
  {
@@ -458,21 +590,28 @@ float stop_right = 0;
    ros::init(argc, argv, "Point_and_MD_listener");
    ros::NodeHandle nh;
    ros::Rate r(10);
-  
-  //RAW point cloud 
+   ros::Subscriber msg_sub_;
+
+
+  // Default value version
+   nh.param("tank_mine_limiar", tank_mine_limiar, 150000);
+   nh.param("personal_mine_limiar", personal_mine_limiar, 30000);
+
+   msg_sub_ = nh.subscribe("sweep_state", 1, flag_msgCallback);
+
+  //RAW point cloud
    pcl_raw_pub = nh.advertise<sensor_msgs::PointCloud> ("raw_points", 10);
-  
-   
+
+   pontos_prado_pub = nh.advertise<geometry_msgs::Point> ("geo_point_minas", 1000);
+
    // --- Kriging
    //interpolacao.set_variogram_cell_radius(MY_RTI_CELL_RADIUS);
    //interpolacao.set_number_of_variograms(MY_RTI_NUMBER_OF_VARIOGRAMS);
 
    //ros::Publisher pcl_pub = nh.advertise<sensor_msgs::PointCloud> ("points2", 10);
    //ros::Publisher pcl_pub2 = nh.advertise<sensor_msgs::PointCloud> ("points2_error", 10);
-   
-   //APAGAR DEPOIS
-   /*ros::Publisher pontos_joao = nh.advertise<geometry_msgs::Point> ("geo_point", 1000);
-   pontos_joao_ptr = &pontos_joao;*/
+
+
 
    boost::thread_group threads;
 
@@ -485,11 +624,11 @@ float stop_right = 0;
    //mapa_local.set_inter_pcl_pub(pcl_pub);
    //mapa_local.set_estimation_variance_pcl_pub(pcl_pub2);
 
-   
+
    //mapa_local.start_IDW_interpolation(threads,interpolacao,MY_RTI_UPDATE_FREQUENCY,0);
- 
+
    //mapa_local.start_Kriging_interpolation(threads,interpolacao,error_interp,MY_RTI_UPDATE_FREQUENCY,0);  //10, era 2
-   
+
    // --- end krigring ---------
 
 
@@ -497,25 +636,25 @@ float stop_right = 0;
    marker_pub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 1);
    //PointCloud_pub = nh.advertise<pcl::PointCloud<pcl::PointXYZ> ("points2", 1);
 
- 
-   //COM MESSAGE FILTERS 
+
+   //COM MESSAGE FILTERS
  /*  message_filters::Subscriber<geometry_msgs::PointStamped> position_sub(nh, "/coil_position", 1);
    message_filters::Subscriber<Coil> coils_sub(nh, "/coils", 1); //middle coil only
-   
+
    //for MD and odor sensor
    typedef sync_policies::ApproximateTime<geometry_msgs::PointStamped,Coil> MySyncPolicy;
    Synchronizer<MySyncPolicy> sync(MySyncPolicy(30), position_sub, coils_sub);
    sync.registerCallback(boost::bind( &myCallback , _1, _2));
    */
-  
+
    //COM MESSAGE FILTERS e TF listener
-    
-	 MetalDetector md;
-        
-        
+
+     MetalDetector md;
+
+
    ros::spin();
-   
+
    threads.join_all();
 
-  
+
  }
